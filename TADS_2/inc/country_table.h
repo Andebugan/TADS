@@ -9,6 +9,6 @@ extern country_t country_table[MAX_COUNTRY_TABLE_SIZE];
 extern unsigned int country_table_size;
 
 int ctrt_load_from_file(const char *filename);
-
+void ctrt_print(void);
 
 #endif // _COUNTRY_TABLE_H_
