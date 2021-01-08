@@ -19,36 +19,36 @@ int ctr_scanf(FILE *file, country_t *country);
 
 // общие поля:
 // название, кол-во жителей, столица, материк, вид туризма
-int __scanf_common(FILE *file, country_t *country);
+static int __scanf_common(FILE *file, country_t *country);
 
 // поля экскурсионного туризма:
 // кол-во объектов, основной вид
-int __scanf_sightseeing(FILE *file, country_t *country);
+static int __scanf_sightseeing(FILE *file, country_t *country);
 
 // поля пляжного туризма:
 // сезон, температура воздуха, температура воды, время полёта
-int __scanf_beach(FILE *file, country_t *country);
+static int __scanf_beach(FILE *file, country_t *country);
 
 // поля спортивного туризма:
 // вид спорта, минимальная стоимость отдыха
-int __scanf_sport(FILE *file, country_t *country);
+static int __scanf_sport(FILE *file, country_t *country);
 
 // === специальные функции ===
 
 // считывает название материка
-int __scanf_continent(FILE *file, continent_t *continent);
+static int __scanf_continent(FILE *file, continent_t *continent);
 
 // считывает вид туризма
-int __scanf_tourism_spec(FILE *file, tourism_t *tourism);
+static int __scanf_tourism_spec(FILE *file, tourism_t *tourism);
 
 // считывает вид экскурсионного туризма
-int __scanf_sightseeing_type(FILE *file, sightseeing_t *sightseeing);
+static int __scanf_sightseeing_type(FILE *file, sightseeing_t *sightseeing);
 
 // считывает сезон для пляжного туризма
-int __scanf_season(FILE *file, season_t *season);
+static int __scanf_season(FILE *file, season_t *season);
 
 // считывает вид спорта
-int __scanf_sport_type(FILE *file, sport_t *sport);
+static int __scanf_sport_type(FILE *file, sport_t *sport);
 
 // ===========================
 
@@ -56,17 +56,17 @@ int __scanf_sport_type(FILE *file, sport_t *sport);
 
 // пропускает переданный символ и все
 // пробельные символы перед ним
-int __scanf_sym(FILE *file, int symbol);
+static int __scanf_sym(FILE *file, int symbol);
 
 // считывает целое неотрицательное число
-int __scanf_uint(FILE *file, unsigned int *number);
+static int __scanf_uint(FILE *file, unsigned int *number);
 
 // считывает вещественное число
-int __scanf_float(FILE *file, float *number);
+static int __scanf_float(FILE *file, float *number);
 
 // считывает строку до разделительного
 // символа, обрезая пробелы по краям
-int __scanf_string(FILE *file, char *buf, int buf_size);
+static int __scanf_string(FILE *file, char *buf, int buf_size);
 
 // ===============================
 
@@ -104,7 +104,7 @@ int ctr_scanf(FILE *file, country_t *country)
 
 // ================================= //
 
-int __scanf_common(FILE *file, country_t *country)
+static int __scanf_common(FILE *file, country_t *country)
 {
     int status = SUCCESS;
 
@@ -121,7 +121,7 @@ int __scanf_common(FILE *file, country_t *country)
     return status;
 }
 
-int __scanf_sightseeing(FILE *file, country_t *country)
+static int __scanf_sightseeing(FILE *file, country_t *country)
 {
     int status = SUCCESS;
 
@@ -132,7 +132,7 @@ int __scanf_sightseeing(FILE *file, country_t *country)
     return status;
 }
 
-int __scanf_beach(FILE *file, country_t *country)
+static int __scanf_beach(FILE *file, country_t *country)
 {
     int status = SUCCESS;
 
@@ -147,9 +147,7 @@ int __scanf_beach(FILE *file, country_t *country)
     return status;
 }
 
-// поля спортивного туризма:
-// вид спорта, минимальная стоимость отдыха
-int __scanf_sport(FILE *file, country_t *country)
+static int __scanf_sport(FILE *file, country_t *country)
 {
     int status = SUCCESS;
 
@@ -162,31 +160,31 @@ int __scanf_sport(FILE *file, country_t *country)
 
 // ================================= //
 
-int __scanf_continent(FILE *file, continent_t *continent)
+static int __scanf_continent(FILE *file, continent_t *continent)
 {
     // TODO: сделать ввод по названиям материков
     return __scanf_uint(file, continent);
 }
 
-int __scanf_tourism_spec(FILE *file, tourism_t *tourism)
+static int __scanf_tourism_spec(FILE *file, tourism_t *tourism)
 {
     // TODO: сделать ввод по названиям
     return __scanf_uint(file, tourism);
 }
 
-int __scanf_sightseeing_type(FILE *file, sightseeing_t *sightseeing)
+static int __scanf_sightseeing_type(FILE *file, sightseeing_t *sightseeing)
 {
     // TODO: сделать ввод по названиям
     return __scanf_uint(file, sightseeing);
 }
 
-int __scanf_season(FILE *file, season_t *season)
+static int __scanf_season(FILE *file, season_t *season)
 {
     // TODO: сделать ввод по названиям
     return __scanf_uint(file, season);
 }
 
-int __scanf_sport_type(FILE *file, sport_t *sport)
+static int __scanf_sport_type(FILE *file, sport_t *sport)
 {
     // TODO: сделать ввод по названиям
     return __scanf_uint(file, sport);
@@ -194,7 +192,7 @@ int __scanf_sport_type(FILE *file, sport_t *sport)
 
 // ================================= //
 
-int __scanf_sym(FILE *file, int symbol)
+static int __scanf_sym(FILE *file, int symbol)
 {
     char c;
 
@@ -206,17 +204,17 @@ int __scanf_sym(FILE *file, int symbol)
     return c == symbol ? SUCCESS : SCANF_BAD_DELIM;
 }
 
-int __scanf_uint(FILE *file, unsigned int *number)
+static int __scanf_uint(FILE *file, unsigned int *number)
 {
     return fscanf(file, "%u", number) == 1 ? SUCCESS : SCANF_BAD_UINT;
 }
 
-int __scanf_float(FILE *file, float *number)
+static int __scanf_float(FILE *file, float *number)
 {
     return fscanf(file, "%f", number) == 1 ? SUCCESS : SCANF_BAD_FLOAT;
 }
 
-int __scanf_string(FILE *file, char *buf, int buf_size)
+static int __scanf_string(FILE *file, char *buf, int buf_size)
 {
     char c;
 
