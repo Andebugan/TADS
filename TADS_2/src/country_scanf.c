@@ -7,7 +7,7 @@
 
 // разделительный и концевой символы для ввода
 #define SCANF_DELIM ','
-#define SCANF_END ';'
+#define SCANF_END '\n'
 
 #define SAFE_SCANF(func)   \
     if (status == SUCCESS) \

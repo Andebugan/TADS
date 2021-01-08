@@ -1,22 +1,14 @@
 #include <stdio.h>
 #include "status_codes.h"
-#include "country.h"
+#include "country_table.h"
 
 int main(void)
 {
     int status = SUCCESS;
 
-    FILE *file = fopen("in.txt", "rt");
-
-    country_t country;
-    status = ctr_scanf(file, &country);
-
-    if (status == SUCCESS)
-    {
-        printf("%s\n%s\n", country.name, country.capital);
-    }
-
-    fclose(file);
+    status = ctrt_load_from_file("in.txt");
+    printf("load status = %d\n", status);
+    printf("table size = %d\n", country_table_size);
 
     return status;
 }
