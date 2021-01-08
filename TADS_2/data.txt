@@ -1,0 +1,20 @@
+Bulgaria,6951482,Sofia,3,1,1,27.5,20.6,7.6
+Nepal,29136808,Kathmandu,3,0,47,0
+Macao,667400,Ciudad de Macao,3,1,1,24.5,24.1,5.9
+Bulgaria,6951482,Sofia,3,0,21,0
+Russia,146748590,Moscow,3,2,1,12548
+Congo,90945551,Kinshasa,0,1,2,27.7,20.4,13.6
+Sweden,10377781,Stockholm,3,0,75,1
+Ecuador,17643054,Quito,5,1,0,21.2,19.2,12.9
+Canada,37602103,Ottawa,4,0,74,2
+Ghana,31072940,Accra,0,1,1,26.7,24.3,6.0
+Ecuador,17643054,Quito,5,2,2,40908
+Swaziland,1160164,Mbabane,0,1,2,23.2,18.6,14.7
+Swaziland,1160164,Mbabane,0,2,2,98713
+Ghana,31072940,Accra,0,2,2,34727
+Ghana,31072940,Accra,0,0,32,2
+Croatia,4154213,Zagreb,3,2,0,54024
+Ghana,31072940,Accra,0,1,1,21.3,18.9,6.6
+Sweden,10377781,Stockholm,3,0,52,2
+Mexico,128932753,Mexico City,5,0,37,2
+Congo,90945551,Kinshasa,0,1,2,26.0,20.9,8.3
