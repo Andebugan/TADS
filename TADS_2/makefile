@@ -1,6 +1,7 @@
 CC := gcc
 
-CFLAGS := -std=c99 -Wall -Werror -pedantic -Wextra -Iinc
+CFLAGS := -std=c99 -Wall -Werror -pedantic -Wextra -Iinc \
+	-Wno-incompatible-pointer-types
 
 SRC := $(shell find src -name *.c)
 
