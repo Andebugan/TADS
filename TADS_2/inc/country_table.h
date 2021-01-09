@@ -12,9 +12,9 @@ typedef struct
 {
     unsigned int index;
     unsigned int population;
-} key_t;
+} tkey_t;
 
-extern key_t key_table[MAX_TABLE_SIZE];
+extern tkey_t key_table[MAX_TABLE_SIZE];
 
 // загружает таблицу из файла
 int ctrt_load_from_file(const char *filename);

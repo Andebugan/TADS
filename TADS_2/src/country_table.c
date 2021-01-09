@@ -7,7 +7,7 @@
 country_t country_table[MAX_TABLE_SIZE];
 unsigned int country_table_size;
 
-key_t key_table[MAX_TABLE_SIZE];
+tkey_t key_table[MAX_TABLE_SIZE];
 
 // === вспомогательные функции === //
 
