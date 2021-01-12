@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "status_codes.h"
-#include "queue_arr.h"
+#include "queue/queue_arr.h"
 
 #define QUEUE_CHECK assert(queue != NULL && "bad queue")
 
@@ -83,6 +83,6 @@ qdata_t *qua_at(qu_arr_t queue, unsigned int index)
 {
     QUEUE_CHECK;
 
-    assert(index < queue->capacity);
+    assert(index < queue->size && "bad index");
     return queue->data + (index + queue->back_index) % queue->capacity;
 }
