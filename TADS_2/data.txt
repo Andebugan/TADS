@@ -1,0 +1,3 @@
+Canada,37602103,Ottawa,4,2,2,25772
+Colombia,50612648,Bogota,5,0,59,2
+Canada,37602103,Ottawa,4,0,67,1

@@ -1,1 +1,13 @@
-5 8 2 7
+fbc
+aba
+aaa
+abc
+aab
+abb
+acb
+aa
+acc
+cba
+cab 
+bfc
+cbfanb
