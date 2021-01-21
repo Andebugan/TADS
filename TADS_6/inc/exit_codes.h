@@ -1,0 +1,4 @@
+#define EXIT_SUCCESS 0
+#define ALLOCATION_FAILURE 1
+#define INVALID_FNAME 2
+#define EMPTY_SOURCE 3
