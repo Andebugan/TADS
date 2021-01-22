@@ -1,7 +1,10 @@
 #include <stdlib.h>
 #include <assert.h>
+#include "timer.h"
 #include "status_codes.h"
 #include "sparse_matrix.h"
+
+unsigned int mult_iterations = 1000;
 
 #define ASSERT_MAT(matrix)                                                                                                 \
     {                                                                                                                      \
@@ -183,7 +186,7 @@ void sp_transpose(sp_mat_t *matrix)
 }
 
 // умножение вектора-строки на матрицу (обычный метод)
-int sp_mult_vector_slow(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix)
+int sp_mult_vector_slow(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix, float *time)
 {
     int status = SUCCESS;
     ASSERT_MAT(vector);
@@ -203,19 +206,30 @@ int sp_mult_vector_slow(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix)
         output->data_cols = malloc(matrix->cols * sizeof(mat_index_t));
         output->rows_array = malloc(2 * sizeof(mat_index_t));
 
-        // индекс текущего обрабатываемого элемента матрицы - он же индекс столбца
-        for (mat_index_t col = 0; col < output->cols; col++)
-        {
-            // настройка индексов столбцов у элементов
-            output->data_cols[col] = col;
+        START_TIMER;
 
-            for (mat_index_t row = 0; row < matrix->rows; row++)
-                output->data_array[col] += sp_get(vector, 0, row) * sp_get(matrix, row, col);
+        for (unsigned int iteration = 0; iteration < mult_iterations; iteration++)
+        {
+            // индекс текущего обрабатываемого элемента матрицы - он же индекс столбца
+            for (mat_index_t col = 0; col < output->cols; col++)
+            {
+                // настройка индексов столбцов у элементов
+                output->data_cols[col] = col;
+
+                output->data_array[col] = 0;
+                for (mat_index_t row = 0; row < matrix->rows; row++)
+                    output->data_array[col] += sp_get(vector, 0, row) * sp_get(matrix, row, col);
+            }
+
+            // начало и конец первой и единственной строки
+            output->rows_array[0] = 0;
+            output->rows_array[1] = output->cols + 1;
         }
 
-        // начало и конец первой и единственной строки
-        output->rows_array[0] = 0;
-        output->rows_array[1] = output->cols + 1;
+        END_TIMER;
+
+        if (time != NULL)
+            *time = TIMER_MCS / 1000.0f / mult_iterations;
 
         sp_zip(output);
     }
@@ -224,7 +238,7 @@ int sp_mult_vector_slow(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix)
 }
 
 // умножение вектора-строки на матрицу (эффективный метод)
-int sp_mult_vector_fast(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix)
+int sp_mult_vector_fast(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix, float *time)
 {
     int status = SUCCESS;
     ASSERT_MAT(vector);
@@ -247,44 +261,54 @@ int sp_mult_vector_fast(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix)
         // транспонировать исходную матрицу
         sp_transpose(matrix);
 
-        // индекс текущего обрабатываемого элемента матрицы - он же индекс столбца
-        for (mat_index_t nz_index = 0; nz_index < output->cols; nz_index++)
+        START_TIMER;
+
+        for (unsigned int iteration = 0; iteration < mult_iterations; iteration++)
         {
-            // настройка индексов столбцов у элементов
-            output->data_cols[nz_index] = nz_index;
-
-            // предустановка индексов для обхода
-            mat_index_t nz_mat_index = matrix->rows_array[nz_index];
-            mat_index_t nz_vec_index = 0;
-            mat_index_t nz_mat_index_end = matrix->rows_array[nz_index + 1];
-            mat_index_t nz_vec_index_end = vector->nz_count;
-
-            mat_data_t sum = 0;
-
-            // пока не дошли до конца хотябы одной из строк матриц
-            while (nz_mat_index < nz_mat_index_end && nz_vec_index < nz_vec_index_end)
+            // индекс текущего обрабатываемого элемента матрицы - он же индекс столбца
+            for (mat_index_t nz_index = 0; nz_index < output->cols; nz_index++)
             {
-                // находим ближайшую пару индексов nz_vec_index и nz_mat_index с одинаковыми индексами столбцов
-                while (vector->data_cols[nz_vec_index] < matrix->data_cols[nz_mat_index])
+                // настройка индексов столбцов у элементов
+                output->data_cols[nz_index] = nz_index;
+
+                // предустановка индексов для обхода
+                mat_index_t nz_mat_index = matrix->rows_array[nz_index];
+                mat_index_t nz_vec_index = 0;
+                mat_index_t nz_mat_index_end = matrix->rows_array[nz_index + 1];
+                mat_index_t nz_vec_index_end = vector->nz_count;
+
+                mat_data_t sum = 0;
+
+                // пока не дошли до конца хотябы одной из строк матриц
+                while (nz_mat_index < nz_mat_index_end && nz_vec_index < nz_vec_index_end)
+                {
+                    // находим ближайшую пару индексов nz_vec_index и nz_mat_index с одинаковыми индексами столбцов
+                    while (vector->data_cols[nz_vec_index] < matrix->data_cols[nz_mat_index])
+                        nz_vec_index++;
+
+                    while (vector->data_cols[nz_vec_index] > matrix->data_cols[nz_mat_index])
+                        nz_mat_index++;
+
+                    // если нашли, добавляем произведение к сумме и увеличиваем оба индекса
+                    if (nz_vec_index < nz_vec_index_end && nz_mat_index < nz_mat_index_end && vector->data_cols[nz_vec_index] == matrix->data_cols[nz_mat_index])
+                        sum += vector->data_array[nz_vec_index] * matrix->data_array[nz_mat_index];
+
                     nz_vec_index++;
-
-                while (vector->data_cols[nz_vec_index] > matrix->data_cols[nz_mat_index])
                     nz_mat_index++;
+                }
 
-                // если нашли, добавляем произведение к сумме и увеличиваем оба индекса
-                if (nz_vec_index < nz_vec_index_end && nz_mat_index < nz_mat_index_end && vector->data_cols[nz_vec_index] == matrix->data_cols[nz_mat_index])
-                    sum += vector->data_array[nz_vec_index] * matrix->data_array[nz_mat_index];
-
-                nz_vec_index++;
-                nz_mat_index++;
+                output->data_array[nz_index] = sum;
             }
 
-            output->data_array[nz_index] = sum;
+            // начало и конец первой и единственной строки
+            output->rows_array[0] = 0;
+            output->rows_array[1] = output->cols + 1;
         }
 
-        // начало и конец первой и единственной строки
-        output->rows_array[0] = 0;
-        output->rows_array[1] = output->cols + 1;
+        END_TIMER;
+
+        if (time != NULL)
+            *time = TIMER_MCS / 1000.0f / mult_iterations;
 
         sp_zip(output);
 

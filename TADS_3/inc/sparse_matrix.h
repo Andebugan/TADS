@@ -68,9 +68,11 @@ void sp_zip(sp_mat_t *matrix);
 void sp_transpose(sp_mat_t *matrix);
 
 // умножение вектора-строки на матрицу (обычный метод)
-int sp_mult_vector_slow(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix);
+// time - время выполнения функции (мс) (можно передать NULL)
+int sp_mult_vector_slow(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix, float *time);
 
 // умножение вектора-строки на матрицу (эффективный метод)
-int sp_mult_vector_fast(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix);
+// time - время выполнения функции (мс) (можно передать NULL)
+int sp_mult_vector_fast(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix, float *time);
 
 #endif // _SPARSE_MATRIX_H_

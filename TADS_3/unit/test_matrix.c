@@ -31,8 +31,10 @@ int test_mult_slow_1x3x3(void)
         { 0 C 0 C 3}
     });
 
-    int status = sp_mult_vector_slow(&out, &vec, &mat);
+    float time;
+    int status = sp_mult_vector_slow(&out, &vec, &mat, &time);
     EXPECT_STATUS(status, SUCCESS);
+    printf("slow time: %f ms\n", time);
 
     EXPECT_MAT((&out), 1, 3, {{ 8 C 9 C 0 }});
 
@@ -59,8 +61,10 @@ int test_mult_fast_1x3x3(void)
         { 0 C 0 C 3}
     });
 
-    int status = sp_mult_vector_fast(&out, &vec, &mat);
+    float time;
+    int status = sp_mult_vector_fast(&out, &vec, &mat, &time);
     EXPECT_STATUS(status, SUCCESS);
+    printf("fast time: %f ms\n", time);
 
     EXPECT_MAT((&out), 1, 3, {{ 8 C 9 C 0 }});
 
