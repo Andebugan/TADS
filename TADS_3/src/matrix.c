@@ -248,12 +248,38 @@ int sp_mult_vector_fast(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix)
         sp_transpose(matrix);
 
         // индекс текущего обрабатываемого элемента матрицы - он же индекс столбца
-        for (mat_index_t col = 0; col < output->cols; col++)
+        for (mat_index_t nz_index = 0; nz_index < output->cols; nz_index++)
         {
             // настройка индексов столбцов у элементов
-            output->data_cols[col] = col;
+            output->data_cols[nz_index] = nz_index;
 
-            // TODO
+            // предустановка индексов для обхода
+            mat_index_t nz_mat_index = matrix->rows_array[nz_index];
+            mat_index_t nz_vec_index = 0;
+            mat_index_t nz_mat_index_end = matrix->rows_array[nz_index + 1];
+            mat_index_t nz_vec_index_end = vector->nz_count;
+
+            mat_data_t sum = 0;
+
+            // пока не дошли до конца хотябы одной из строк матриц
+            while (nz_mat_index < nz_mat_index_end && nz_vec_index < nz_vec_index_end)
+            {
+                // находим ближайшую пару индексов nz_vec_index и nz_mat_index с одинаковыми индексами столбцов
+                while (vector->data_cols[nz_vec_index] < matrix->data_cols[nz_mat_index])
+                    nz_vec_index++;
+
+                while (vector->data_cols[nz_vec_index] > matrix->data_cols[nz_mat_index])
+                    nz_mat_index++;
+
+                // если нашли, добавляем произведение к сумме и увеличиваем оба индекса
+                if (nz_vec_index < nz_vec_index_end && nz_mat_index < nz_mat_index_end && vector->data_cols[nz_vec_index] == matrix->data_cols[nz_mat_index])
+                    sum += vector->data_array[nz_vec_index] * matrix->data_array[nz_mat_index];
+
+                nz_vec_index++;
+                nz_mat_index++;
+            }
+
+            output->data_array[nz_index] = sum;
         }
 
         // начало и конец первой и единственной строки
