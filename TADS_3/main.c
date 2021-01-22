@@ -6,7 +6,12 @@ int main(void)
 
     FILE *file = fopen("mat.txt", "rt");
 
-    printf("%d\n", sp_scanf(file, &mat));
+    printf("scan status: %d\n", sp_scanf(file, &mat));
+
+    sp_print_raw(stdout, &mat);
+    printf("mat size: %lu bytes\n", sp_calc_size(&mat));
+
+    sp_free_mat(&mat);
 
     return 0;
 }

@@ -25,10 +25,10 @@ unit : unit.exe
 	rm -rf *.gcda *.gcno
 
 app.exe : $(OBJ) main.c
-	$(CC) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^
 
 unit.exe : $(OBJ) $(TEST_OBJ) unit.c
-	$(CC) --coverage -o $@ $^
+	$(CC) $(CFLAGS) --coverage -o $@ $^
 
 $(OBJ) : obj/%.o : src/%.c
 	mkdir -p $(dir $@); $(CC) $(CFLAGS) -o $@ -c $^

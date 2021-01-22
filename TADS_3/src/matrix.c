@@ -40,6 +40,18 @@ sp_mat_t sp_zero(mat_index_t rows, mat_index_t cols)
     return matrix;
 }
 
+// вычисляет размер матрицы в байтах
+size_t sp_calc_size(sp_mat_t *matrix)
+{
+    size_t size = sizeof(sp_mat_t);
+
+    size += matrix->nz_count * sizeof(mat_data_t);
+    size += matrix->nz_count * sizeof(mat_index_t);
+    size += (matrix->rows + 1) * sizeof(mat_index_t);
+
+    return size;
+}
+
 // очищает память из-под матрицы
 void sp_free_mat(sp_mat_t *matrix)
 {

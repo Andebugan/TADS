@@ -52,6 +52,9 @@ int sp_print_raw(FILE *file, sp_mat_t *matrix);
 // инициализирует нулевую матрицу для ручного заполнения
 sp_mat_t sp_zero(mat_index_t rows, mat_index_t cols);
 
+// вычисляет размер матрицы в байтах
+size_t sp_calc_size(sp_mat_t *matrix);
+
 // очищает память из-под матрицы
 void sp_free_mat(sp_mat_t *matrix);
 
