@@ -102,6 +102,9 @@ int sp_scanf(FILE *file, sp_mat_t *matrix)
 
     free(line);
 
+    if (cols == 0 || rows == 0)
+        status = BAD_FILE;
+
     if (status == SUCCESS)
         *matrix = sp_from_dense(dense_matrix, rows, cols);
 

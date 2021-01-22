@@ -216,6 +216,8 @@ int sp_mult_vector_slow(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix)
         // начало и конец первой и единственной строки
         output->rows_array[0] = 0;
         output->rows_array[1] = output->cols + 1;
+
+        sp_zip(output);
     }
 
     return status;
@@ -257,6 +259,8 @@ int sp_mult_vector_fast(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix)
         // начало и конец первой и единственной строки
         output->rows_array[0] = 0;
         output->rows_array[1] = output->cols + 1;
+
+        sp_zip(output);
 
         // транспонировать исходную матрицу обратно
         sp_transpose(matrix);

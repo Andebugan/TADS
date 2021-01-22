@@ -6,6 +6,8 @@ enum status_codes
     SUCCESS = 0,
     FAILURE,
 
+    BAD_FILE,
+
     BAD_FSCANF,
     BAD_FPRINTF,
 
