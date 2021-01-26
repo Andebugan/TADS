@@ -44,7 +44,6 @@ typedef enum
     CLIMBING
 } sport_t;
 
-// Основная структура записи таблицы
 typedef struct
 {
     char name[COUNTRY_MAX_NAME_LENGTH];
@@ -76,8 +75,5 @@ typedef struct
 
 int ctr_scanf(FILE *file, country_t *country);
 int ctr_prompt(country_t *country);
-int ctr_search(continent_t *continent, sport_t *sport);
-// Удаление элемента
-int delete_by_index(void);
 
 #endif // _COUNTRY_H_

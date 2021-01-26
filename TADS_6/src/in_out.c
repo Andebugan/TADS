@@ -4,13 +4,11 @@
 #include "timer.h"
 #include "colors.h"
 
-// Приветствие
 void greets()
 {
     puts(YELLOW "<Лабораторная работа №6>" RESET);
 }
 
-// Заполнение буфера
 int fill_buff(const char *fname, buff_t *buff)
 {
     FILE *source = fopen(fname, "r");
@@ -23,10 +21,6 @@ int fill_buff(const char *fname, buff_t *buff)
     {
         if (cur[strlen(cur) - 1] == '\n')
             cur[strlen(cur) - 1] = '\0';
-        if (cur[strlen(cur) - 1] == '\r')
-            cur[strlen(cur) - 1] = '\0';
-        if (cur[strlen(cur) - 2] == '\r')
-            cur[strlen(cur) - 2] = '\0';
         else
             cur[strlen(cur)] = '\0';
         strcpy(buff->buff[cur_size++], cur);
@@ -39,28 +33,25 @@ int fill_buff(const char *fname, buff_t *buff)
     return EXIT_SUCCESS;
 }
 
-// Главное меню
 void main_menu()
 {
     puts(CYAN "<Главное меню>" RESET);
     puts(YELLOW "1 - Работа с бинарным деревом поиска");
     puts("2 - Работа с хэш-таблицей");
-    puts("3 - Сравнение добавления слова в различные структуры данных");
+    puts("3 - Замер времени вставки элемента в файл *отладка*");
     puts("Для выхода из программы нажмите любую другую клавишу..." RESET);
 }
 
-// Хеш-меню
 void hash_menu()
 {
     puts("");
     puts(YELLOW "1 - Построить хэш-таблицу по данным из файла");
     puts("2 - Вывести таблицу на экран");
     puts("3 - Добавить слово в хэш-таблицу");
-    puts("0 - Выход в главное меню" RESET);
+    puts("Для выхода в главное меню нажмите любую другую клавишу..." RESET);
     puts("");
 }
 
-// Меню ДДП
 void tree_menu()
 {
     puts("");
@@ -69,11 +60,10 @@ void tree_menu()
     puts("3 - Добавить слово в несбалансированное ДДП");
     puts("4 - Добавить слово в сбалансированное ДДП");
     puts("5 - Сравнить время добавления слов в несбалансированное и\n сбалансированное ДДП");
-    puts("0 - Выход в главное меню" RESET);
+    puts("Для выхода в главное меню нажмите любую другую клавишу..." RESET);
     puts("");
 }
 
-// Меню файла
 void get_fname()
 {
     puts("");
@@ -83,7 +73,6 @@ void get_fname()
     puts("");
 }
 
-// Очиста потока ввода
 void clean_input_stream()
 {
     int c;

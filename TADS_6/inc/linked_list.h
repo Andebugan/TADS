@@ -1,10 +1,8 @@
 #ifndef _LINKED_LIST_H_
 #define _LINKED_LIST_H_
 
-#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "colors.h"
 #include "timer.h"
 
 typedef struct hash_linked hash_linked_t;

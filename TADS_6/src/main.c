@@ -15,11 +15,11 @@ int main(void)
     // Переменная-буффер для хранения данных из файла
     buff_t buff;
     // Переменная для хранения корня несбалансированного дерева
-    tree_node_t *tree_root = NULL;
+    tree_node_t *tree_root;
     // Переменная для хранения сбалансированного ДДП
-    tree_node_t *tree_root_balanced = NULL;
+    tree_node_t *tree_root_balanced;
     // Указатель на хеш-таблицу
-    hash_linked_t *hash_table = NULL;
+    hash_linked_t *hash_table;
     // Размер хеш-таблицы
     size_t hash_size;
     // Среднее значение коллизий
@@ -41,7 +41,6 @@ int main(void)
     // Обработка ввода
     while (scanf("%d", &choice) == 1)
     {
-        clean_input_stream();
         // В случае обработки дерева поиска
         if (choice == 1)
         {
@@ -66,25 +65,19 @@ int main(void)
                 }
                 else if (rc == EXIT_SUCCESS)
                 {
-                    // Выбор режима работы с ДДП
                     int tree_choice;
-                    // Переменная для замера времени
                     int64_t time;
                     // Меню работы с деревом поиска
                     tree_menu();
                     // Работа с ДДП
-                    while (scanf("%d", &tree_choice) == 1 && tree_choice != 0)
+                    while (scanf("%d", &tree_choice) == 1)
                     {
-                        // Постоить ДДП
+                        // Построение дерева
                         if (tree_choice == 1)
                         {
-                            // Существует построенное дерево
                             tree_built = 1;
-                            // Заполняем АВЛ дерево
                             fill_balanced(&tree_root_balanced, buff, &time);
-                            // Заполняем несбалансированное дерево
                             fill_tree(&tree_root, buff, &time);
-                            // Выводим несбалансированное дерево
                             print_tree(tree_root, 0, 0, 0, 0U, 0);
                             clean_input_stream();
                         }
@@ -114,14 +107,11 @@ int main(void)
                             }
                             else
                             {
-                                long comp = 0;
                                 printf(CYAN "Введите добавляемое слово: " RESET);
                                 char word[255];
                                 scanf("%s", word);
-                                // Добавляем в несбалансированное дерево
-                                add_unbalanced(&tree_root, word, &comp);
-                                // Дублируем в сбалансированное дерево
-                                add_elem_balanced(&tree_root_balanced, word, &comp);
+                                add_unbalanced(&tree_root, word);
+                                add_elem_balanced(&tree_root_balanced, word);
 
                                 print_tree(tree_root, 0, 0, 0, 0U, 0);
                                 clean_input_stream();
@@ -130,14 +120,11 @@ int main(void)
                         // Добавить слово в сбалансированное ДДП
                         else if (tree_choice == 4)
                         {
-                            long comp = 0;
                             printf(CYAN "Введите добавляемое слово: " RESET);
                             char word[255];
-                            scanf("%s", word); 
-                            // Добавляем в сбалансированное дерево
-                            add_elem_balanced(&tree_root_balanced, word, &comp);
-                            // Дублируем в несбалансированное дерево
-                            add_unbalanced(&tree_root, word, &comp);
+                            scanf("%s", word);
+                            add_elem_balanced(&tree_root_balanced, word);
+                            add_unbalanced(&tree_root, word);
 
                             print_tree(tree_root_balanced, 0, 0, 0, 0U, 0);
                             clean_input_stream();
@@ -145,35 +132,22 @@ int main(void)
                         // Сравнить время добавления в сбалансированное и несбалансированное ДДП
                         else if (tree_choice == 5)
                         {
-                            long comp = 0;
                             int64_t balance_time = 0, not_balance_time = 0;
 
-                            printf(CYAN "Введите добавляемое слово: " RESET);
-                            char word[255];
+                            tree_node_t *test_tree = NULL;
+                            tree_node_t *test_tree_balanced = NULL;
 
-                            scanf("%s", word);
-                            
-                            // Добавляем с подсчётом времени
-                            balance_time = add_elem_balanced(&tree_root_balanced, word, &comp);
-                            not_balance_time = add_unbalanced(&tree_root, word, &comp);
+                            fill_tree(&test_tree, buff, &not_balance_time);
 
-                            puts(YELLOW "Полученные замеры времени: " RESET);
+                            fill_balanced(&test_tree_balanced, buff, &balance_time);
+
+                            puts(YELLOW "Полученные замеры: " RESET);
                             printf(CYAN "Сбалансированное ДДП: " RESET " %.3lf\n", (float)balance_time / buff.size);
-                            printf(CYAN "Несбалансированное ДДП: " RESET " %.3lf\n\n", (float)not_balance_time / buff.size);
-
-                            printf(YELLOW "Сбалансированное ДДП:\n" RESET);
-                            print_tree(tree_root_balanced, 0, 0, 0, 0U, 0);
-                            printf(YELLOW "Несбалансированное ДДП:\n" RESET);
-                            print_tree(tree_root, 0, 0, 0, 0U, 0);
+                            printf(CYAN "Несбалансированное ДДП: " RESET " %.3lf\n", (float)not_balance_time / buff.size);
 
                             clean_input_stream();
                         }
-                        else if (tree_choice == 0)
-                        {
-                            main_menu();
-                            clean_input_stream();
-                            break;
-                        }
+                        // Обработка ошибочного ввода
                         else
                         {
                             clean_input_stream();
@@ -186,7 +160,7 @@ int main(void)
             clean_input_stream();
         }
         // Работа с хеш-таблицей
-        else if (choice == 2)
+        if (choice == 2)
         {
             // Получение имени файла
             get_fname();
@@ -212,12 +186,12 @@ int main(void)
                     int hash_choice;
                     // Вывод меню
                     hash_menu();
-                    while (scanf("%d", &hash_choice) == 1 && hash_choice != 0)
+                    while (scanf("%d", &hash_choice) == 1)
                     {
                         // Создание таблицы на основе данных из файла
                         if (hash_choice == 1)
                         {
-                            puts(CYAN "Введите максимально допустимое количество коллизий для одного ключа: " RESET);
+                            puts(CYAN "Введите среднее допустимое количество коллизий: " RESET);
                             if (scanf("%zu", &avg_collisions) != 1)
                             {
                                 puts(RED "Число введено неверно." RESET);
@@ -260,12 +234,11 @@ int main(void)
                                         // Создание таблицы с корректными параметрами
                                         hash_built = 1;
                                         size_t collisions;
-                                        // Заполнение таблицы
                                         collisions = hash_table_fill(&hash_table, hash_size, &buff, key_div);
                                         if (collisions > avg_collisions)
                                         {
-                                            // Пересоздание таблицы в случае превышения максимального количества коллизий для одного ключа
-                                            puts(YELLOW "Превышено максимальное число коллизий для одного ключа. Происходит перестройка таблицы ..." RESET);
+                                            // Пересоздание таблицы в случае превышения свреднего количества коллизий
+                                            puts(YELLOW "Превышено максимальное число коллизий. Происходит перестройка таблицы ..." RESET);
                                             free_table(hash_table, hash_size);
                                             hash_table = calloc(hash_size, sizeof(hash_linked_t));
                                             if (!hash_table)
@@ -275,7 +248,7 @@ int main(void)
                                                 clean_input_stream();
                                                 continue;
                                             }
-                                            collisions = hash_table_fill(&hash_table, hash_size, &buff, bit_hash);
+                                            collisions = hash_table_fill(&hash_table, hash_size, &buff, Jenkins_hash);
                                             func = 1;
                                         }
                                         else
@@ -285,7 +258,6 @@ int main(void)
                                 }
                             }
                         }
-                        // Вывод таблицы на экран
                         if (hash_choice == 2)
                         {
                             if (!hash_built)
@@ -297,7 +269,6 @@ int main(void)
                             }
                             hash_table_print(hash_table, hash_size);
                         }
-                        // Добавление элемента в таблицу
                         if (hash_choice == 3)
                         {
                             if (!hash_built)
@@ -313,11 +284,10 @@ int main(void)
                             scanf("%s", word);
                             size_t key;
 
-                            // Создание ключа для слова в зависимости от того, перестроенная таблица, или нет
                             if (func == 0)
                                 key = key_div(word, hash_size);
                             else
-                                key = bit_hash(word, hash_size);
+                                key = Jenkins_hash(word, hash_size);
 
                             list_insert(&hash_table[key], word, &hash_time);
 
@@ -327,88 +297,24 @@ int main(void)
                             for (size_t i = 0; i < buff.size; i++)
                                 data_size += strlen(buff.buff[i]);
                         }
-                        else if (hash_choice == 0)
-                        {
-                            main_menu();
-                            clean_input_stream();
-                            break;
-                        }
                         hash_menu();
                     }
                     clean_input_stream();
                 }
             }
         }
-        // Сравнения добавления элемента в разные структуры данных
-        else if (choice == 3)
+        if (choice == 3)
         {
-            puts(YELLOW "Введите имя файла: " RESET);
-            int rc = 0;
-            long comp_avl = 0;
-            long comp_ddp = 0;
-            long comp_hash = 0;
+            puts(CYAN "Введите имя файла: ");
             scanf("%s", fname);
-            int64_t time_avl;
-            int64_t time_hash;
-            int64_t time_ddp;
-            int64_t time_file;
-            size_t key;
-            printf(YELLOW "Введите добавляемое слово: " RESET);
+            int64_t time;
+            printf("Введите добавляемое слово: " RESET);
             char word[255];
             scanf("%s", word);
-            rc = file_insert(fname, word, &time_file);
+            int rc = file_insert(fname, word, &time);
             if (rc == INVALID_FNAME)
                 puts(RED "Файл не найден. Попробуйте снова." RESET);
-            if (rc == 0 && tree_root_balanced == NULL)
-            {
-                rc = -1;
-                puts(RED "АВЛ не создано. Сначала создайте АВЛ в меню работы с бинарным деревом." RESET);
-            }
-            else if (rc == 0)
-                time_avl = add_elem_balanced(&tree_root_balanced, word, &comp_avl);
-            if (rc == 0 && tree_root == NULL)
-            {
-                rc = -1;
-                puts(RED "ДДП не создано. Сначала создайте ДДП в меню работы с бинарным деревом." RESET);
-            }
-            else if (rc == 0)
-                time_ddp = add_unbalanced(&tree_root, word, &comp_ddp);
-            if (rc == 0 && hash_table == NULL)
-            {
-                rc = -1;
-                puts(RED "Хеш-таблица не построена. Сначала создайте таблицу в меню работы с хеш-таблицей." RESET);
-            }
-            else if (rc == 0)
-            {
-                if (func == 0)
-                    key = key_div(word, hash_size);
-                else
-                    key = bit_hash(word, hash_size);
-                comp_hash = list_insert(&hash_table[key], word, &time_hash);
-                printf(CYAN "Полученные замеры:\n" RESET);
-                printf("Время добавления в файл: %ld\n", (long)time_file);
-                printf("Время добавления в АВЛ: %ld\n", (long)time_avl);
-                printf("Время добавления в ДДП: %ld\n", (long)time_ddp);
-                printf("Время добавления в хеш-таблицу: %ld\n", (long)time_hash);
-                printf("Количество сравнений АВЛ: %ld\n", comp_avl);
-                printf("Количество сравнений ДДП: %ld\n", comp_ddp);
-                printf("Количество сравнений хеш-таблицы: %ld\n", comp_hash);
-
-                int count = 0;
-                count_tree_nodes(tree_root, &count);
-                printf("Память АВЛ: %ld\n", count * sizeof(tree_node_t));
-                count = 0;
-                count_tree_nodes_unb(tree_root, &count);
-                printf("Память ДДП: %ld\n", count * sizeof(tree_node_t));
-                printf("Память хеш-таблицы: %ld\n", table_elem_col(hash_table, hash_size));
-                
-                printf("Хеш-таблица:\n");
-                hash_table_print(hash_table, hash_size);
-                printf("ДДП:\n");
-                print_tree(tree_root, 0, 0, 0, 0U, 0);
-                printf("АВЛ:\n");
-                print_tree(tree_root_balanced, 0, 0, 0, 0U, 0);
-            }
+            printf(CYAN "Полученные замеры:" RESET "%ld\n", (long)time);
         }
         else
         {
