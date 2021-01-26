@@ -2,7 +2,7 @@ from random import randint, choice
 import sys
 
 out_filename = "data.txt"
-N = 40 if len(sys.argv) == 1 else int(sys.argv[1])
+N = 60 if len(sys.argv) == 1 else int(sys.argv[1])
 data = []
 
 AFRICA = 0

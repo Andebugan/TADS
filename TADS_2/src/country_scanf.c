@@ -2,10 +2,11 @@
 #include <stdlib.h>
 
 #include "status_codes.h"
+#include "country_table.h"
 #include "country.h"
 #include "assert.h"
 
-// разделительный и концевой символы для ввода
+// Разделительный и концевой символы для ввода
 #define SCANF_DELIM ','
 #define SCANF_END '\n'
 
@@ -13,63 +14,49 @@
     if (status == SUCCESS) \
         status = func
 
-// формат считывания:
-// <общие поля>, <специальные поля>
+// Формат считывания: <общие поля>, <специальные поля>
 int ctr_scanf(FILE *file, country_t *country);
 
-// общие поля:
-// название, кол-во жителей, столица, материк, вид туризма
+// Общие поля: название, кол-во жителей, столица, материк, вид туризма
 static int __scanf_common(FILE *file, country_t *country);
 
-// поля экскурсионного туризма:
-// кол-во объектов, основной вид
+// Поля экскурсионного туризма: кол-во объектов, основной вид
 static int __scanf_sightseeing(FILE *file, country_t *country);
 
-// поля пляжного туризма:
-// сезон, температура воздуха, температура воды, время полёта
+// Поля пляжного туризма: сезон, температура воздуха, температура воды, время полёта
 static int __scanf_beach(FILE *file, country_t *country);
 
-// поля спортивного туризма:
-// вид спорта, минимальная стоимость отдыха
+// Поля спортивного туризма: вид спорта, минимальная стоимость отдыха
 static int __scanf_sport(FILE *file, country_t *country);
 
-// === специальные функции ===
-
-// считывает название материка
+// Считывает название материка
 static int __scanf_continent(FILE *file, continent_t *continent);
 
-// считывает вид туризма
+// Считывает вид туризма
 static int __scanf_tourism_spec(FILE *file, tourism_t *tourism);
 
-// считывает вид экскурсионного туризма
+// Считывает вид экскурсионного туризма
 static int __scanf_sightseeing_type(FILE *file, sightseeing_t *sightseeing);
 
-// считывает сезон для пляжного туризма
+// Считывает сезон для пляжного туризма
 static int __scanf_season(FILE *file, season_t *season);
 
-// считывает вид спорта
+// Считывает вид спорта
 static int __scanf_sport_type(FILE *file, sport_t *sport);
 
-// ===========================
-
-// === вспомогательные функции ===
-
-// пропускает переданный символ и все
-// пробельные символы перед ним
+// Пропуск переданного символа и всех пробельных символов перед ним
 static int __scanf_sym(FILE *file, int symbol);
 
-// считывает целое неотрицательное число
+// Считывает целое неотрицательное число
 static int __scanf_uint(FILE *file, unsigned int *number);
 
-// считывает вещественное число
+// Считывает вещественное число
 static int __scanf_float(FILE *file, float *number);
 
-// считывает строку до разделительного
-// символа, обрезая пробелы по краям
+// Считывает строку до разделительного символа, обрезая пробелы по краям
 static int __scanf_string(FILE *file, char *buf, int buf_size);
 
-// ===============================
-
+// Считывание поля данных
 int ctr_scanf(FILE *file, country_t *country)
 {
     int status = __scanf_common(file, country);
@@ -98,12 +85,10 @@ int ctr_scanf(FILE *file, country_t *country)
     }
 
     SAFE_SCANF(__scanf_sym(file, SCANF_END));
-
     return status;
 }
 
-// ================================= //
-
+// Ввод общих параметров поля данных
 static int __scanf_common(FILE *file, country_t *country)
 {
     int status = SUCCESS;
@@ -121,6 +106,7 @@ static int __scanf_common(FILE *file, country_t *country)
     return status;
 }
 
+// Ввод экскурсионного поля данных
 static int __scanf_sightseeing(FILE *file, country_t *country)
 {
     int status = SUCCESS;
@@ -132,6 +118,7 @@ static int __scanf_sightseeing(FILE *file, country_t *country)
     return status;
 }
 
+// Ввод пляжного поля данных
 static int __scanf_beach(FILE *file, country_t *country)
 {
     int status = SUCCESS;
@@ -147,6 +134,7 @@ static int __scanf_beach(FILE *file, country_t *country)
     return status;
 }
 
+// Ввод спортивного поля данных
 static int __scanf_sport(FILE *file, country_t *country)
 {
     int status = SUCCESS;
@@ -158,40 +146,32 @@ static int __scanf_sport(FILE *file, country_t *country)
     return status;
 }
 
-// ================================= //
-
 static int __scanf_continent(FILE *file, continent_t *continent)
 {
-    // TODO: сделать ввод по названиям материков
     return __scanf_uint(file, continent);
 }
 
 static int __scanf_tourism_spec(FILE *file, tourism_t *tourism)
 {
-    // TODO: сделать ввод по названиям
     return __scanf_uint(file, tourism);
 }
 
 static int __scanf_sightseeing_type(FILE *file, sightseeing_t *sightseeing)
 {
-    // TODO: сделать ввод по названиям
     return __scanf_uint(file, sightseeing);
 }
 
 static int __scanf_season(FILE *file, season_t *season)
 {
-    // TODO: сделать ввод по названиям
     return __scanf_uint(file, season);
 }
 
 static int __scanf_sport_type(FILE *file, sport_t *sport)
 {
-    // TODO: сделать ввод по названиям
     return __scanf_uint(file, sport);
 }
 
-// ================================= //
-
+// Пропуск переданного символа и всех пробельных символов перед ним
 static int __scanf_sym(FILE *file, int symbol)
 {
     char c;
@@ -204,31 +184,34 @@ static int __scanf_sym(FILE *file, int symbol)
     return c == symbol ? SUCCESS : SCANF_BAD_DELIM;
 }
 
+// Считывание целого неотрицательного числа
 static int __scanf_uint(FILE *file, unsigned int *number)
 {
     return fscanf(file, "%u", number) == 1 ? SUCCESS : SCANF_BAD_UINT;
 }
 
+// Считывание числа с плавающей точкой
 static int __scanf_float(FILE *file, float *number)
 {
     return fscanf(file, "%f", number) == 1 ? SUCCESS : SCANF_BAD_FLOAT;
 }
 
+// Считывание строки
 static int __scanf_string(FILE *file, char *buf, int buf_size)
 {
     char c;
 
-    // skip blank chars
+    // Пропуск пробелов
     do
     {
         c = fgetc(file);
     } while (isblank(c) && c != SCANF_DELIM && c != SCANF_END);
 
-    // check for bad char
+    // Проверка на правильность символа
     if (c == EOF || c == SCANF_DELIM || c == SCANF_END)
         return SCANF_EMPTY_STRING;
 
-    // put chars in buffer
+    // Считывание символа в буфер
     int i = 0;
     do
     {
@@ -237,11 +220,11 @@ static int __scanf_string(FILE *file, char *buf, int buf_size)
         i++;
     } while (i + 1 < buf_size && c != SCANF_DELIM && c != SCANF_END);
 
-    // put back delim char
+    // Возвращение в файл символа-разделителя
     if (c == SCANF_DELIM || c == SCANF_END)
         ungetc(c, file);
 
-    // strip from the end of buffer
+    // Разделитель в конец буфера
     buf[i] = '\0';
     while (isblank(buf[i - 1]))
         buf[--i] = '\0';

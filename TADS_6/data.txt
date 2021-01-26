@@ -10,4 +10,8 @@ acc
 cba
 cab 
 bfc
-cbfanb
+cbf
+nsd
+
+kdf
+ikd
