@@ -1,7 +1,7 @@
 #include "tree_funcs.h"
 #include "colors.h"
 
-// Инициализация ДДП
+// Инициализация АВЛ
 int tree_node_init(tree_node_t **node, char *string, long height)
 {
     // Выделение памяти под корень
@@ -26,6 +26,32 @@ int tree_node_init(tree_node_t **node, char *string, long height)
     return EXIT_SUCCESS;
 }
 
+// Инициализация ДДП
+int tree_node_init(tree_unbalanced_node_t **node, char *string, long height)
+{
+    // Выделение памяти под корень
+    *node = malloc(sizeof(tree_unbalanced_node_t));
+    // Ошибка выделения памяти
+    if (!*node)
+        return ALLOCATION_FAILURE;
+    // Выделяем память под данные (ключ)
+    (*node)->key = malloc((strlen(string) + 1) * sizeof(char));
+    // Ошибка выделения памяти под данные
+    if (!(*node)->key)
+        return ALLOCATION_FAILURE;
+    // Копируем в ключ строку
+    strcpy((*node)->key, string);
+
+    // Указатели на потомков
+    (*node)->left = NULL;
+    (*node)->right = NULL;
+
+    return EXIT_SUCCESS;
+}
+
+// Конвератция ДДП в АВЛ
+void сonvert_ddp_to_avl(tree_node_t **node, tree_unbalanced_node_t **node)
+
 // Возвращает высоту дерева
 int get_height(tree_node_t *tree)
 {
@@ -39,37 +65,35 @@ int balance_factor(tree_node_t *tree)
 }
 
 // Добавление узла в ДДП
-tree_node_t *insert(tree_node_t *node, char *key, long *height, long *comp)
+tree_unbalanced_node_t  *insert(tree_unbalanced_node_t *node, char *key, long *comp)
 {
     // Увеличение параметров высоты дерева и количества сравнений
-    (*height)++;
     (*comp)++;
     
     // Вставка узла в дерево
     if (!node)
-        tree_node_init(&node, key, *height);
+        tree_node_init(&node, key);
     // Если младше чем предок, то влево
     else if (strcmp(key, node->key) < 0)
-        node->left = insert(node->left, key, height, comp);
+        node->left = insert(node->left, key, comp);
     // Если старше чем предок, то вправо
     else if (strcmp(key, node->key) > 0)
-        node->right = insert(node->right, key, height, comp);
+        node->right = insert(node->right, key, comp);
 
     return node;
 }
 
 // Заполнение несбалансированного ДДП
-int fill_tree(tree_node_t **node, buff_t buff, int64_t *time)
+int fill_tree(tree_unbalanced_node_t **node, buff_t buff, int64_t *time)
 {
     *time = 0;
     int64_t start;
     for (size_t i = 0; i < buff.size; i++)
     {
-        long height = -1;
         long comp = 0;
 
         start = proc_tick();
-        *node = insert(*node, buff.buff[i], &height, &comp);
+        *node = insert(*node, buff.buff[i], &comp);
         *time += proc_tick() - start;
     }
     return EXIT_SUCCESS;
