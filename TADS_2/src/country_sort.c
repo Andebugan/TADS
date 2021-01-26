@@ -1,24 +1,26 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include "country_sort.h"
+#include "colors.h"
 
+// Макрос начала отсчёта времени
 #define BEGIN_TIMER                  \
     struct timeval tv_start, tv_end; \
     gettimeofday(&tv_start, NULL)
 
+// Макрос конца отсчёта времени
 #define END_TIMER                                                \
     gettimeofday(&tv_end, NULL);                                 \
     unsigned long long sec = tv_end.tv_sec - tv_start.tv_sec;    \
     unsigned long long usec = tv_end.tv_usec - tv_start.tv_usec; \
     return 1000000 * sec + usec
 
-// === helper functions === //
-
+// Функция сравнения элементов по полю
 static int __ctr_cmp(const void *ctr_1, const void *ctr_2);
+// Функция сравнения ключей
 static int __key_cmp(const void *key_1, const void *key_2);
 
-// ======================== //
-
+// Перемешивание таблицы данных
 void ctrt_shuffle_table(void)
 {
     for (unsigned int i = 0; i + 1 < country_table_size; i++)
@@ -35,8 +37,10 @@ void ctrt_shuffle_table(void)
             }
         }
     }
+    init_key_table();
 }
 
+// Перемешивание таблицы ключей
 void ctrt_shuffle_key(void)
 {
     for (unsigned int i = 0; i + 1 < country_table_size; i++)
@@ -55,7 +59,7 @@ void ctrt_shuffle_key(void)
     }
 }
 
-// быстрая сортировка исходной таблицы
+// Быстрая сортировка исходной таблицы
 unsigned long long ctrt_sort_fast_table(void)
 {
     BEGIN_TIMER;
@@ -65,7 +69,7 @@ unsigned long long ctrt_sort_fast_table(void)
     END_TIMER;
 }
 
-// быстрая сортировка таблицы ключей
+// Быстрая сортировка таблицы ключей
 unsigned long long ctrt_sort_fast_keys(void)
 {
     BEGIN_TIMER;
@@ -75,7 +79,7 @@ unsigned long long ctrt_sort_fast_keys(void)
     END_TIMER;
 }
 
-// медленная сортировка исходной таблицы
+// Медленная сортировка исходной таблицы (пузырёк)
 unsigned long long ctrt_sort_slow_table(void)
 {
     BEGIN_TIMER;
@@ -98,7 +102,7 @@ unsigned long long ctrt_sort_slow_table(void)
     END_TIMER;
 }
 
-// медленная сортировка таблицы ключей
+// Медленная сортировка таблицы ключей
 unsigned long long ctrt_sort_slow_keys(void)
 {
     BEGIN_TIMER;
@@ -121,6 +125,7 @@ unsigned long long ctrt_sort_slow_keys(void)
     END_TIMER;
 }
 
+// Сортировка таблицы с нахождением среднего времени сортировки для заданного числа интераций
 float ctrt_mid_time(unsigned int iterations, sort_fn_t sort, shuffle_fn_t shuffle)
 {
     unsigned long long time = 0;
@@ -134,8 +139,7 @@ float ctrt_mid_time(unsigned int iterations, sort_fn_t sort, shuffle_fn_t shuffl
     return (float)time / iterations;
 }
 
-// ======================== //
-
+// Функция сравнения элементов по полю
 static int __ctr_cmp(const void *ctr_1, const void *ctr_2)
 {
     unsigned int pop_1 = ((country_t *)ctr_1)->population;
@@ -144,6 +148,7 @@ static int __ctr_cmp(const void *ctr_1, const void *ctr_2)
     return pop_1 - pop_2;
 }
 
+// Функция сравнения ключей
 static int __key_cmp(const void *key_1, const void *key_2)
 {
     unsigned int pop_1 = ((tkey_t *)key_1)->population;

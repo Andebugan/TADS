@@ -1,3 +1,60 @@
-Canada,37602103,Ottawa,4,2,2,25772
-Colombia,50612648,Bogota,5,0,59,2
-Canada,37602103,Ottawa,4,0,67,1
+Sweden,10377781,Stockholm,3,2,1,32211
+Macao,667400,Ciudad de Macao,3,0,59,2
+Swaziland,1160164,Mbabane,0,1,2,21.7,19.4,15.0
+Mexico,128932753,Mexico City,5,0,66,0
+Congo,90945551,Kinshasa,0,0,26,1
+Canada,37602103,Ottawa,4,0,64,1
+Swaziland,1160164,Mbabane,0,0,41,1
+Congo,90945551,Kinshasa,0,2,0,67384
+Nepal,29136808,Kathmandu,3,1,2,27.7,19.3,7.9
+Nepal,29136808,Kathmandu,3,2,2,35202
+Mexico,128932753,Mexico City,5,0,68,2
+Russia,146748590,Moscow,3,2,0,77037
+Mexico,128932753,Mexico City,5,0,49,0
+Mexico,128932753,Mexico City,5,1,1,20.3,23.2,14.6
+Bulgaria,6951482,Sofia,3,2,1,42210
+Russia,146748590,Moscow,3,0,76,0
+Russia,146748590,Moscow,3,1,0,28.0,23.0,14.1
+Colombia,50612648,Bogota,5,1,1,24.3,23.3,13.9
+Canada,37602103,Ottawa,4,0,30,2
+Canada,37602103,Ottawa,4,0,44,2
+Mexico,128932753,Mexico City,5,2,2,23153
+Colombia,50612648,Bogota,5,1,1,21.5,23.8,9.4
+Ecuador,17643054,Quito,5,1,2,21.5,21.8,5.4
+Ghana,31072940,Accra,0,2,0,77037
+Mexico,128932753,Mexico City,5,2,2,51449
+Swaziland,1160164,Mbabane,0,0,64,1
+Croatia,4154213,Zagreb,3,1,1,20.6,19.1,11.1
+Mexico,128932753,Mexico City,5,0,26,2
+Congo,90945551,Kinshasa,0,2,2,22212
+Ecuador,17643054,Quito,5,1,1,27.5,24.8,7.0
+Bulgaria,6951482,Sofia,3,2,2,74761
+Congo,90945551,Kinshasa,0,1,1,21.7,24.7,14.0
+Mexico,128932753,Mexico City,5,1,2,20.3,20.3,12.0
+Sweden,10377781,Stockholm,3,2,2,47721
+Sweden,10377781,Stockholm,3,0,23,1
+Bulgaria,6951482,Sofia,3,2,0,79225
+Russia,146748590,Moscow,3,1,1,25.3,23.3,10.2
+Mexico,128932753,Mexico City,5,1,1,24.0,21.1,10.5
+Nepal,29136808,Kathmandu,3,0,55,1
+Canada,37602103,Ottawa,4,1,2,25.0,21.7,6.1
+Ghana,31072940,Accra,0,0,29,2
+Canada,37602103,Ottawa,4,0,63,2
+Canada,37602103,Ottawa,4,1,1,28.0,20.8,6.0
+Bulgaria,6951482,Sofia,3,0,69,1
+Bulgaria,6951482,Sofia,3,1,0,23.4,23.8,10.1
+Ghana,31072940,Accra,0,2,0,80911
+Canada,37602103,Ottawa,4,0,28,0
+Croatia,4154213,Zagreb,3,1,0,23.9,24.4,6.7
+Bulgaria,6951482,Sofia,3,1,1,27.7,23.1,9.4
+Mexico,128932753,Mexico City,5,2,0,37972
+Congo,90945551,Kinshasa,0,1,1,23.1,20.7,12.6
+Swaziland,1160164,Mbabane,0,0,43,2
+Ghana,31072940,Accra,0,0,62,0
+Croatia,4154213,Zagreb,3,0,70,0
+Ghana,31072940,Accra,0,2,2,28213
+Canada,37602103,Ottawa,4,0,52,0
+Mexico,128932753,Mexico City,5,0,72,1
+Russia,146748590,Moscow,3,1,2,23.2,21.0,7.2
+Ghana,31072940,Accra,0,0,75,0
+Ecuador,17643054,Quito,5,1,1,21.0,21.4,5.3

@@ -1,5 +1,6 @@
 #include "timer.h"
 
+// Функция для замера времени процессора
 uint64_t proc_tick(void)
 {
     uint32_t high;
