@@ -26,32 +26,6 @@ int tree_node_init(tree_node_t **node, char *string, long height)
     return EXIT_SUCCESS;
 }
 
-// Инициализация ДДП
-int tree_node_init(tree_unbalanced_node_t **node, char *string, long height)
-{
-    // Выделение памяти под корень
-    *node = malloc(sizeof(tree_unbalanced_node_t));
-    // Ошибка выделения памяти
-    if (!*node)
-        return ALLOCATION_FAILURE;
-    // Выделяем память под данные (ключ)
-    (*node)->key = malloc((strlen(string) + 1) * sizeof(char));
-    // Ошибка выделения памяти под данные
-    if (!(*node)->key)
-        return ALLOCATION_FAILURE;
-    // Копируем в ключ строку
-    strcpy((*node)->key, string);
-
-    // Указатели на потомков
-    (*node)->left = NULL;
-    (*node)->right = NULL;
-
-    return EXIT_SUCCESS;
-}
-
-// Конвератция ДДП в АВЛ
-void сonvert_ddp_to_avl(tree_node_t **node, tree_unbalanced_node_t **node)
-
 // Возвращает высоту дерева
 int get_height(tree_node_t *tree)
 {
@@ -65,35 +39,36 @@ int balance_factor(tree_node_t *tree)
 }
 
 // Добавление узла в ДДП
-tree_unbalanced_node_t  *insert(tree_unbalanced_node_t *node, char *key, long *comp)
+tree_node_t  *insert(tree_node_t *node, char *key, long *height, long *comp)
 {
     // Увеличение параметров высоты дерева и количества сравнений
     (*comp)++;
+    (*height)++;
     
     // Вставка узла в дерево
     if (!node)
-        tree_node_init(&node, key);
+        tree_node_init(&node, key, *height);
     // Если младше чем предок, то влево
     else if (strcmp(key, node->key) < 0)
-        node->left = insert(node->left, key, comp);
+        node->left = insert(node->left, key, height, comp);
     // Если старше чем предок, то вправо
     else if (strcmp(key, node->key) > 0)
-        node->right = insert(node->right, key, comp);
+        node->right = insert(node->right, key, height, comp);
 
     return node;
 }
 
-// Заполнение несбалансированного ДДП
-int fill_tree(tree_unbalanced_node_t **node, buff_t buff, int64_t *time)
+// Заполнение несбалансированного АВЛ
+int fill_tree(tree_node_t **node, buff_t buff, int64_t *time)
 {
     *time = 0;
     int64_t start;
     for (size_t i = 0; i < buff.size; i++)
     {
         long comp = 0;
-
+        long height = -1;
         start = proc_tick();
-        *node = insert(*node, buff.buff[i], &comp);
+        *node = insert(*node, buff.buff[i], &height, &comp);
         *time += proc_tick() - start;
     }
     return EXIT_SUCCESS;
@@ -147,9 +122,7 @@ tree_node_t *rotate_right(tree_node_t *root)
 // Добавление элемента в ДДП
 tree_node_t *add_balanced(tree_node_t *tree, char *key, long *height, long *comp)
 {
-    // Увеличиваем параметр максимальной высоты ДДП
     (*height)++;
-    // Увеличиваем параметр количества узлов
     (*comp)++;
 
     // Инициализируем дерево, если оно отсутствует
@@ -161,17 +134,17 @@ tree_node_t *add_balanced(tree_node_t *tree, char *key, long *height, long *comp
     // Если ключ старше предка, то в правое поддерево
     else if (strcmp(key, tree->key) > 0)
         tree->right = add_balanced(tree->right, key, height, comp);
-
+    fix_height(tree);
     // Балансировка дерева
-    return root_balance(tree);
+    if (balance_factor(tree) > 1 || balance_factor(tree) < -1)
+        return root_balance(tree);
+    else
+        return tree;
 }
 
 // Проверка дерева на критерий сбалансированного АВЛ
 tree_node_t *root_balance(tree_node_t *root)
 {
-    // Обновление высоты корня
-    fix_height(root);
-
     // Дерево не сбалансировано, высота правого поддерева на 2 больше чем левого
     if (balance_factor(root) == 2)
     {   
@@ -213,7 +186,7 @@ int fill_balanced(tree_node_t **tree, buff_t buff, int64_t *time)
     return EXIT_SUCCESS;
 }
 
-// Подсчёт количества элементов в дереве
+// Подсчёт количества элементов в АВЛ
 void count_tree_nodes(tree_node_t *node, int *count)
 {
     if (node)
@@ -224,18 +197,7 @@ void count_tree_nodes(tree_node_t *node, int *count)
     }
 }
 
-// Подсчёт количества элементов в дереве
-void count_tree_nodes_unb(tree_unbalanced_node_t *node, int *count)
-{
-    if (node)
-    {
-        (*count)++;
-        count_tree_nodes(node->left, count);
-        count_tree_nodes(node->right, count);
-    }
-}
-
-// Вывод ДДП на экран
+// Вывод АВЛ на экран
 void print_tree(tree_node_t *node, size_t tab, int is_left, int is_right, unsigned int notch, int is_root)
 {
     if (node)
@@ -262,5 +224,105 @@ void print_tree(tree_node_t *node, size_t tab, int is_left, int is_right, unsign
         printf("\n");
 
         print_tree(node->right, tab + 1, 0, 1, (is_right ? (notch << 1) : (notch << 1) | 1), is_root);
+    }
+}
+
+// =====================================================================================================
+
+// Подсчёт количества элементов в ДДП
+void count_tree_nodes_uns(tree_uns_node_t *node, int *count)
+{
+    if (node)
+    {
+        (*count)++;
+        count_tree_nodes_uns(node->left, count);
+        count_tree_nodes_uns(node->right, count);
+    }
+}
+
+// Инициализация ДДП
+int tree_node_uns_init(tree_uns_node_t **node, char *string)
+{
+    // Выделение памяти под корень
+    *node = malloc(sizeof(tree_uns_node_t));
+    // Ошибка выделения памяти
+    if (!*node)
+        return ALLOCATION_FAILURE;
+    // Выделяем память под данные (ключ)
+    (*node)->key = malloc((strlen(string) + 1) * sizeof(char));
+    // Ошибка выделения памяти под данные
+    if (!(*node)->key)
+        return ALLOCATION_FAILURE;
+    // Копируем в ключ строку
+    strcpy((*node)->key, string);
+
+    // Указатели на потомков
+    (*node)->left = NULL;
+    (*node)->right = NULL;
+
+    return EXIT_SUCCESS;
+}
+
+// Добавление узла в ДДП
+tree_uns_node_t  *insert_uns(tree_uns_node_t *node, char *key, long *comp)
+{
+    // Увеличение параметров высоты дерева и количества сравнений
+    (*comp)++;
+    
+    // Вставка узла в дерево
+    if (!node)
+        tree_node_uns_init(&node, key);
+    // Если младше чем предок, то влево
+    else if (strcmp(key, node->key) < 0)
+        node->left = insert_uns(node->left, key, comp);
+    // Если старше чем предок, то вправо
+    else if (strcmp(key, node->key) > 0)
+        node->right = insert_uns(node->right, key, comp);
+
+    return node;
+}
+
+// Заполнение ДДП
+int fill_uns_tree(tree_uns_node_t **node, buff_t buff, int64_t *time)
+{
+    *time = 0;
+    int64_t start;
+    for (size_t i = 0; i < buff.size; i++)
+    {
+        long comp = 0;
+        start = proc_tick();
+        *node = insert_uns(*node, buff.buff[i], &comp);
+        *time += proc_tick() - start;
+    }
+    return EXIT_SUCCESS;
+}
+
+// Вывод ДДП на экран
+void print_tree_uns(tree_uns_node_t *node, size_t tab, int is_left, int is_right, unsigned int notch, int is_root)
+{
+    if (node)
+    {
+        print_tree_uns(node->left, tab + 1, 1, 0, (is_left ? (notch << 1) : (notch << 1) | 1), 0);
+
+        for (size_t i = 0; i < tab; i++)
+        {
+            if ((i != 0) && (notch & (1U << (tab - i - 1))))
+                printf("|");
+            else
+                printf("  ");
+            printf("%*s", INDENT, "");
+        }
+
+        printf("%s", (is_left ? "┌─" : (is_right ? "└─" : "")));
+
+        int n = snprintf(NULL, 0, "%s", node->key);
+        if (is_root)
+            printf("%.*s", (INDENT - n) * 3, "―――――");
+        printf(" %s ", node->key);
+        is_root = 1;
+
+        printf("\n");
+
+        print_tree_uns(node->right, tab + 1, 0, 1, (is_right ? (notch << 1) : (notch << 1) | 1), is_root);
     }
 }

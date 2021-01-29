@@ -5,7 +5,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-#define DEFAULT 250
+#define DEFAULT 20
 
 typedef char buff_string[251];
 

@@ -22,10 +22,10 @@ size_t bit_hash(char *s, size_t table_size)
     {
         hash += *s++;
         hash += (hash << 1);
-        hash ^= (hash << 1);
+        hash ^= (hash >> 1);
     }
     hash += (hash << 1);
-    hash ^= (hash << 1);
+    hash ^= (hash >> 1);
     return hash % table_size;
 }
 
@@ -101,7 +101,6 @@ long int table_elem_col(hash_linked_t *table, int size)
     for (int i = 0; i < size; i++)
     {
         cur = &table[i];
-        count += sizeof(hash_linked_t);
         for (; cur->next; cur = cur->next)
             count += sizeof(hash_linked_t);
     }

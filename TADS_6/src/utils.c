@@ -16,14 +16,12 @@ int file_insert(const char *fname, char *string, int64_t *time)
     return EXIT_SUCCESS;
 }
 
-// Добавление элемента в несбалансированное ДДП с замером времени
-int64_t add_unbalanced(tree_node_t **tree, char *key, long *comp)
+// Добавление элемента в ДДП с замером времени
+int64_t add_unbalanced(tree_uns_node_t **tree, char *key, long *comp)
 {
-    long height = -1;
-
     int64_t start, end;
     start = proc_tick();
-    *tree = insert(*tree, key, &height, comp);
+    *tree = insert_uns(*tree, key, comp);
     end = proc_tick() - start;
 
     return end;

@@ -15,9 +15,9 @@ int main(void)
     // Переменная-буффер для хранения данных из файла
     buff_t buff;
     // Переменная для хранения корня несбалансированного дерева
-    tree_node_t *tree_root = NULL;
+    tree_uns_node_t *tree_uns_root = NULL;
     // Переменная для хранения сбалансированного ДДП
-    tree_node_t *tree_root_balanced = NULL;
+    tree_node_t *tree_root = NULL;
     // Указатель на хеш-таблицу
     hash_linked_t *hash_table = NULL;
     // Размер хеш-таблицы
@@ -26,7 +26,9 @@ int main(void)
     size_t avg_collisions;
     // Переменная для определения перестроенной/неперестроенной таблицы
     int func = 0;
-    // Переменная для определения построено дерево или нет
+    // Переменная для определения ДДП или нет
+    int tree_uns_built = 0;
+    // Переменная для определения АВЛ или нет
     int tree_built = 0;
     // Переменная для определения построена ли хеш-таблица или нет
     int hash_built = 0;
@@ -75,38 +77,32 @@ int main(void)
                     // Работа с ДДП
                     while (scanf("%d", &tree_choice) == 1 && tree_choice != 0)
                     {
-                        // Постоить ДДП
+                        // Постоить ДДП и вывести на экран
                         if (tree_choice == 1)
                         {
-                            // Существует построенное дерево
+                            // Существует построенное дерево ДДП
+                            tree_uns_built = 1;
+                            // Заполняем ДДП
+                            fill_uns_tree(&tree_uns_root, buff, &time);
+                            // Выводим несбалансированное дерево
+                            print_tree_uns(tree_uns_root, 0, 0, 0, 0U, 0);
+                            clean_input_stream();
+                        }
+                        // Построить АВЛ и вывести на экран
+                        else if (tree_choice == 2)
+                        {
+                            // Существует построенное дерево АВЛ
                             tree_built = 1;
-                            // Заполняем АВЛ дерево
-                            fill_balanced(&tree_root_balanced, buff, &time);
-                            // Заполняем несбалансированное дерево
-                            fill_tree(&tree_root, buff, &time);
+                            // Заполняем ДДП
+                            fill_balanced(&tree_root, buff, &time);
                             // Выводим несбалансированное дерево
                             print_tree(tree_root, 0, 0, 0, 0U, 0);
                             clean_input_stream();
                         }
-                        // Вывод дерева
-                        else if (tree_choice == 2)
-                        {
-                            if (!tree_built)
-                            {
-                                puts(RED "Ошибка! Сначала дерево нужно построить." RESET);
-                                clean_input_stream();
-                                tree_menu();
-                            }
-                            else
-                            {
-                                print_tree(tree_root_balanced, 0, 0, 0, 0U, 0);
-                                clean_input_stream();
-                            }
-                        }
                         // Добавить слово в несбалансированное ДДП
                         else if (tree_choice == 3)
                         {
-                            if (!tree_built)
+                            if (!tree_uns_built)
                             {
                                 puts(RED "Ошибка! Сначала дерево нужно построить." RESET);
                                 clean_input_stream();
@@ -119,28 +115,63 @@ int main(void)
                                 char word[255];
                                 scanf("%s", word);
                                 // Добавляем в несбалансированное дерево
-                                add_unbalanced(&tree_root, word, &comp);
-                                // Дублируем в сбалансированное дерево
-                                add_elem_balanced(&tree_root_balanced, word, &comp);
+                                add_unbalanced(&tree_uns_root, word, &comp);
+
+                                print_tree_uns(tree_uns_root, 0, 0, 0, 0U, 0);
+                                clean_input_stream();
+                            }
+                        }
+                        // Добавить слово в АВЛ
+                        else if (tree_choice == 4)
+                        {
+                            if (!tree_built)
+                            {
+                                puts(RED "Ошибка! Сначала дерево нужно построить." RESET);
+                                clean_input_stream();
+                                tree_menu();
+                            }
+                            else
+                            {
+                                long comp = 0;
+                                printf(CYAN "Введите добавляемое слово: " RESET);
+                                char word[255];
+                                scanf("%s", word); 
+                                // Добавляем в АВЛ
+                                add_elem_balanced(&tree_root, word, &comp);
 
                                 print_tree(tree_root, 0, 0, 0, 0U, 0);
                                 clean_input_stream();
                             }
                         }
-                        // Добавить слово в сбалансированное ДДП
-                        else if (tree_choice == 4)
+                        // Вывод АВЛ
+                        else if (tree_choice == 5)
                         {
-                            long comp = 0;
-                            printf(CYAN "Введите добавляемое слово: " RESET);
-                            char word[255];
-                            scanf("%s", word); 
-                            // Добавляем в сбалансированное дерево
-                            add_elem_balanced(&tree_root_balanced, word, &comp);
-                            // Дублируем в несбалансированное дерево
-                            add_unbalanced(&tree_root, word, &comp);
-
-                            print_tree(tree_root_balanced, 0, 0, 0, 0U, 0);
-                            clean_input_stream();
+                            if (!tree_built)
+                            {
+                                puts(RED "Ошибка! Сначала АВЛ нужно построить." RESET);
+                                clean_input_stream();
+                                tree_menu();
+                            }
+                            else
+                            {
+                                print_tree(tree_root, 0, 0, 0, 0U, 0);
+                                clean_input_stream();
+                            }
+                        }
+                        // Вывод ДДП
+                        else if (tree_choice == 6)
+                        {
+                            if (!tree_uns_built)
+                            {
+                                puts(RED "Ошибка! Сначала ДДП нужно построить." RESET);
+                                clean_input_stream();
+                                tree_menu();
+                            }
+                            else
+                            {
+                                print_tree_uns(tree_uns_root, 0, 0, 0, 0U, 0);
+                                clean_input_stream();
+                            }
                         }
                         // Сравнить время добавления в сбалансированное и несбалансированное ДДП
                         else if (tree_choice == 5)
@@ -154,17 +185,17 @@ int main(void)
                             scanf("%s", word);
                             
                             // Добавляем с подсчётом времени
-                            balance_time = add_elem_balanced(&tree_root_balanced, word, &comp);
-                            not_balance_time = add_unbalanced(&tree_root, word, &comp);
+                            balance_time = add_elem_balanced(&tree_root, word, &comp);
+                            not_balance_time = add_unbalanced(&tree_uns_root, word, &comp);
 
                             puts(YELLOW "Полученные замеры времени: " RESET);
-                            printf(CYAN "Сбалансированное ДДП: " RESET " %.3lf\n", (float)balance_time / buff.size);
-                            printf(CYAN "Несбалансированное ДДП: " RESET " %.3lf\n\n", (float)not_balance_time / buff.size);
+                            printf(CYAN "АВЛ: " RESET " %.3lf\n", (float)balance_time / buff.size);
+                            printf(CYAN "ДДП: " RESET " %.3lf\n\n", (float)not_balance_time / buff.size);
 
-                            printf(YELLOW "Сбалансированное ДДП:\n" RESET);
-                            print_tree(tree_root_balanced, 0, 0, 0, 0U, 0);
-                            printf(YELLOW "Несбалансированное ДДП:\n" RESET);
+                            printf(YELLOW "АВЛ:\n" RESET);
                             print_tree(tree_root, 0, 0, 0, 0U, 0);
+                            printf(YELLOW "ДДП:\n" RESET);
+                            print_tree_uns(tree_uns_root, 0, 0, 0, 0U, 0);
 
                             clean_input_stream();
                         }
@@ -359,20 +390,20 @@ int main(void)
             rc = file_insert(fname, word, &time_file);
             if (rc == INVALID_FNAME)
                 puts(RED "Файл не найден. Попробуйте снова." RESET);
-            if (rc == 0 && tree_root_balanced == NULL)
+            if (rc == 0 && tree_root == NULL)
             {
                 rc = -1;
                 puts(RED "АВЛ не создано. Сначала создайте АВЛ в меню работы с бинарным деревом." RESET);
             }
             else if (rc == 0)
-                time_avl = add_elem_balanced(&tree_root_balanced, word, &comp_avl);
-            if (rc == 0 && tree_root == NULL)
+                time_avl = add_elem_balanced(&tree_root, word, &comp_avl);
+            if (rc == 0 && tree_uns_root == NULL)
             {
                 rc = -1;
                 puts(RED "ДДП не создано. Сначала создайте ДДП в меню работы с бинарным деревом." RESET);
             }
             else if (rc == 0)
-                time_ddp = add_unbalanced(&tree_root, word, &comp_ddp);
+                time_ddp = add_unbalanced(&tree_uns_root, word, &comp_ddp);
             if (rc == 0 && hash_table == NULL)
             {
                 rc = -1;
@@ -398,16 +429,16 @@ int main(void)
                 count_tree_nodes(tree_root, &count);
                 printf("Память АВЛ: %ld\n", count * sizeof(tree_node_t));
                 count = 0;
-                count_tree_nodes_unb(tree_root, &count);
-                printf("Память ДДП: %ld\n", count * sizeof(tree_node_t));
+                count_tree_nodes_uns(tree_uns_root, &count);
+                printf("Память ДДП: %ld\n", count * sizeof(tree_uns_node_t));
                 printf("Память хеш-таблицы: %ld\n", table_elem_col(hash_table, hash_size));
                 
                 printf("Хеш-таблица:\n");
                 hash_table_print(hash_table, hash_size);
                 printf("ДДП:\n");
-                print_tree(tree_root, 0, 0, 0, 0U, 0);
+                print_tree_uns(tree_uns_root, 0, 0, 0, 0U, 0);
                 printf("АВЛ:\n");
-                print_tree(tree_root_balanced, 0, 0, 0, 0U, 0);
+                print_tree(tree_root, 0, 0, 0, 0U, 0);
             }
         }
         else

@@ -1,17 +1,12 @@
+#include "menu.h"
+#include "status_codes.h"
 #include "sparse_matrix.h"
 
 int main(void)
 {
-    sp_mat_t mat;
+    int status = SUCCESS;
 
-    FILE *file = fopen("mat.txt", "rt");
+    status = menu_loop();
 
-    printf("scan status: %d\n", sp_scanf(file, &mat));
-
-    sp_print_raw(stdout, &mat);
-    printf("mat size: %lu bytes\n", sp_calc_size(&mat));
-
-    sp_free_mat(&mat);
-
-    return 0;
+    return status;
 }
