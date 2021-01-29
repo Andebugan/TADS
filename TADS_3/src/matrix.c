@@ -232,6 +232,7 @@ int sp_mult_vector_slow(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix, fl
         // Создаём матрицу для записи результата произведения
         output->rows = 1;
         output->cols = matrix->cols;
+        output->nz_count = output->cols;
         output->data_array = calloc(matrix->cols, sizeof(mat_data_t));
         output->data_cols = malloc(matrix->cols * sizeof(mat_index_t));
         output->rows_array = malloc(2 * sizeof(mat_index_t));
@@ -287,6 +288,7 @@ int sp_mult_vector_fast(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix, fl
         // Создание матрицы под произведение
         output->rows = 1;
         output->cols = matrix->cols;
+        output->nz_count = output->cols;
         output->data_array = calloc(matrix->cols, sizeof(mat_data_t));
         output->data_cols = malloc(matrix->cols * sizeof(mat_index_t));
         output->rows_array = malloc(2 * sizeof(mat_index_t));
