@@ -26,429 +26,448 @@
         -:   25:#define INDEX_IN_POS(matrix, row, col, index) (INDEX_IN_ROW(matrix, row, index) && INDEX_IN_COL(matrix, col, index))
         -:   26:
         -:   27:// инициализирует нулевую матрицу для ручного заполнения
-        5:   28:sp_mat_t sp_zero(mat_index_t rows, mat_index_t cols)
+       14:   28:sp_mat_t sp_zero(mat_index_t rows, mat_index_t cols)
         -:   29:{
         -:   30:    sp_mat_t matrix;
         -:   31:
-        5:   32:    matrix.rows = rows;
-        5:   33:    matrix.cols = cols;
-        5:   34:    matrix.nz_count = 0;
+       14:   32:    matrix.rows = rows;
+       14:   33:    matrix.cols = cols;
+       14:   34:    matrix.nz_count = 0;
         -:   35:
-        5:   36:    matrix.data_array = malloc(0);
-        5:   37:    matrix.data_cols = malloc(0);
-        5:   38:    matrix.rows_array = calloc(rows + 1, sizeof(mat_index_t));
+       14:   36:    matrix.data_array = malloc(0);
+       14:   37:    matrix.data_cols = malloc(0);
+       14:   38:    matrix.rows_array = calloc(rows + 1, sizeof(mat_index_t));
         -:   39:
-        5:   40:    return matrix;
-        5:   40-block  0
+       14:   40:    return matrix;
+       14:   40-block  0
         -:   41:}
         -:   42:
-        -:   43:// очищает память из-под матрицы
-        7:   44:void sp_free_mat(sp_mat_t *matrix)
+        -:   43:// вычисляет размер матрицы в байтах
+    #####:   44:size_t sp_calc_size(sp_mat_t *matrix)
         -:   45:{
-        7:   46:    if (matrix->data_array != NULL)
-        7:   46-block  0
-        -:   47:    {
-        7:   48:        free(matrix->data_array);
-        7:   49:        matrix->data_array = NULL;
-        -:   50:
-        7:   51:        free(matrix->data_cols);
-        7:   52:        matrix->data_cols = NULL;
-        -:   53:
-        7:   54:        free(matrix->rows_array);
-        7:   55:        matrix->rows_array = NULL;
-        7:   55-block  0
-        -:   56:    }
-        7:   57:}
-        -:   58:
-        -:   59:// получает конкретный элемент по индексам
-    18007:   60:mat_data_t sp_get(sp_mat_t *matrix, mat_index_t row, mat_index_t col)
-        -:   61:{
-   18007*:   62:    ASSERT_MAT(matrix);
-    18007:   62-block  0
-    %%%%%:   62-block  1
-    18007:   62-block  2
-    18007:   62-block  3
-    18007:   62-block  4
-    %%%%%:   62-block  5
-    18007:   63:    mat_index_t nz_index = matrix->rows_array[row];
-    18007:   64:    mat_index_t nz_last = matrix->rows_array[row + 1];
+    #####:   46:    size_t size = sizeof(sp_mat_t);
+        -:   47:
+    #####:   48:    size += matrix->nz_count * sizeof(mat_data_t);
+    #####:   49:    size += matrix->nz_count * sizeof(mat_index_t);
+    #####:   50:    size += (matrix->rows + 1) * sizeof(mat_index_t);
+        -:   51:
+    #####:   52:    return size;
+    %%%%%:   52-block  0
+        -:   53:}
+        -:   54:
+        -:   55:// очищает память из-под матрицы
+       10:   56:void sp_free_mat(sp_mat_t *matrix)
+        -:   57:{
+       10:   58:    if (matrix->data_array != NULL)
+       10:   58-block  0
+        -:   59:    {
+       10:   60:        free(matrix->data_array);
+       10:   61:        matrix->data_array = NULL;
+        -:   62:
+       10:   63:        free(matrix->data_cols);
+       10:   64:        matrix->data_cols = NULL;
         -:   65:
-    31013:   66:    while (nz_index < nz_last && matrix->data_cols[nz_index] < col)
-    18007:   66-block  0
-    31013:   66-block  1
-    26013:   66-block  2
-    13006:   67:        nz_index++;
-    13006:   67-block  0
-        -:   68:
-    18007:   69:    if (nz_index < nz_last && matrix->data_cols[nz_index] == col)
-    18007:   69-block  0
-    13007:   69-block  1
-    10007:   70:        return matrix->data_array[nz_index];
-    10007:   70-block  0
-        -:   71:    else
-     8000:   72:        return 0;
-     8000:   72-block  0
-        -:   73:}
-        -:   74:
-        -:   75:// устанавливает конкретный элемент по индексам
-       13:   76:void sp_set(sp_mat_t *matrix, mat_index_t row, mat_index_t col, mat_data_t value)
-        -:   77:{
-      13*:   78:    ASSERT_MAT(matrix);
-       13:   78-block  0
-    %%%%%:   78-block  1
-       13:   78-block  2
-       13:   78-block  3
-       13:   78-block  4
-    %%%%%:   78-block  5
-        -:   79:
-       13:   80:    mat_index_t nz_index = matrix->rows_array[row];
-       13:   81:    mat_index_t nz_last = matrix->rows_array[row + 1];
-        -:   82:
-       17:   83:    while (nz_index < nz_last && matrix->data_cols[nz_index] < col)
-       13:   83-block  0
-       17:   83-block  1
-        4:   83-block  2
-        4:   84:        nz_index++;
-        4:   84-block  0
-        -:   85:
-      13*:   86:    if (nz_index < nz_last && matrix->data_cols[nz_index] == col)
-       13:   86-block  0
-    %%%%%:   86-block  1
-    #####:   87:        matrix->data_array[nz_index] = value;
-    %%%%%:   87-block  0
-        -:   88:    else
-        -:   89:    {
-       13:   90:        matrix->nz_count++;
-       13:   91:        matrix->data_array = realloc(matrix->data_array, matrix->nz_count * sizeof(mat_data_t));
-       13:   92:        matrix->data_cols = realloc(matrix->data_cols, matrix->nz_count * sizeof(mat_data_t));
-       13:   92-block  0
-        -:   93:
-        -:   94:        mat_data_t temp_elem;
-        -:   95:        mat_index_t temp_col;
-        -:   96:
-        -:   97:        do
-        -:   98:        {
-       13:   99:            temp_elem = matrix->data_array[nz_index];
-       13:  100:            temp_col = matrix->data_cols[nz_index];
-        -:  101:
-       13:  102:            matrix->data_array[nz_index] = value;
-       13:  103:            matrix->data_cols[nz_index] = col;
-        -:  104:
-       13:  105:            value = temp_elem;
-       13:  106:            col = temp_col;
-        -:  107:
-       13:  108:            nz_index++;
-        -:  109:        }
-       13:  110:        while (nz_index < matrix->nz_count);
-       13:  110-block  0
-        -:  111:
-        -:  112:        // обновить список индексов строк
-       36:  113:        while (row++ < matrix->rows)
-       13:  113-block  0
-       36:  113-block  1
-       23:  114:            matrix->rows_array[row]++;
-       23:  114-block  0
-        -:  115:    }
-       13:  116:}
-        -:  117:
-        -:  118:// удаление нулевых элементов из матрицы
-        2:  119:void sp_zip(sp_mat_t *matrix)
-        -:  120:{
-       2*:  121:    ASSERT_MAT(matrix);
-        2:  121-block  0
-    %%%%%:  121-block  1
-        2:  121-block  2
-        2:  121-block  3
-        2:  121-block  4
-    %%%%%:  121-block  5
-        -:  122:
-        2:  123:    mat_index_t z_count = 0;
-        2:  124:    mat_index_t row = 0;
-        4:  125:    for (mat_index_t nz_index = 0; nz_index + z_count < matrix->nz_count; nz_index++)
-        2:  125-block  0
-        4:  125-block  1
-        -:  126:    {
-        -:  127:        // при переходе на следующую строку удаляем из строки все нулевые
-        2:  128:        while (matrix->rows_array[row + 1] <= nz_index + z_count)
-        2:  128-block  0
-        2:  128-block  1
-    #####:  129:            matrix->rows_array[++row] -= z_count; 
-    %%%%%:  129-block  0
-        -:  130:
-        2:  131:        if (matrix->data_array[nz_index] == 0) // наш клиент
-        2:  131-block  0
-    #####:  132:            z_count++;
-    %%%%%:  132-block  0
-        -:  133:
-        2:  134:        matrix->data_array[nz_index] = matrix->data_array[nz_index + z_count];
-        2:  135:        matrix->data_cols[nz_index] = matrix->data_cols[nz_index + z_count];
-        2:  135-block  0
-        -:  136:    }
-        -:  137:
-        -:  138:    // при переходе на следующую строку удаляем из строки все нулевые
-        6:  139:    while (row < matrix->rows + 1)
-        2:  139-block  0
-        6:  139-block  1
-        4:  140:        matrix->rows_array[++row] -= z_count; 
-        4:  140-block  0
-        -:  141:
-        2:  142:    matrix->nz_count -= z_count;
-        2:  143:    matrix->data_array = realloc(matrix->data_array, matrix->nz_count * sizeof(mat_data_t));
-        2:  144:    matrix->data_cols = realloc(matrix->data_cols, matrix->nz_count * sizeof(mat_data_t));
-        2:  145:}
-        -:  146:
-        -:  147:// транспозиция матрицы на месте
-        2:  148:void sp_transpose(sp_mat_t *matrix)
-        -:  149:{
-        -:  150:    sp_mat_t new_mat;
-        2:  151:    new_mat.rows = matrix->cols;
-        2:  152:    new_mat.cols = matrix->rows;
-        2:  153:    new_mat.nz_count = matrix->nz_count;
-        -:  154:
-        2:  155:    new_mat.data_array = malloc(new_mat.nz_count * sizeof(mat_data_t));
-        2:  156:    new_mat.data_cols = malloc(new_mat.nz_count * sizeof(mat_index_t));
-        2:  157:    new_mat.rows_array = malloc((new_mat.rows + 1) * sizeof(mat_index_t));
-        -:  158:
-        2:  159:    mat_index_t new_nz_index = 0;
-        2:  160:    new_mat.rows_array[0] = 0;
-        8:  161:    for (mat_index_t col = 0; col < matrix->cols; col++)
-        2:  161-block  0
-        8:  161-block  1
-        -:  162:    {
-       30:  163:        for (mat_index_t nz_index = 0; nz_index < matrix->nz_count; nz_index++)
-        6:  163-block  0
-       24:  163-block  1
-       30:  163-block  2
-        -:  164:        {
-       24:  165:            if (INDEX_IN_COL(matrix, col, nz_index))
-       24:  165-block  0
-        -:  166:            {
-        -:  167:                // выяснить индекс строки в старой матрице
-        8:  168:                mat_index_t row = 0;
-       15:  169:                while (!INDEX_IN_ROW(matrix, row, nz_index))
-        8:  169-block  0
-       15:  169-block  1
-       15:  169-block  2
-        7:  170:                    row++;
-        7:  170-block  0
-        -:  171:
-        -:  172:                // записать этот элемент в транспонированную матрицу
-        8:  173:                new_mat.data_array[new_nz_index] = matrix->data_array[nz_index];
-        8:  174:                new_mat.data_cols[new_nz_index] = row;
-        8:  175:                new_nz_index++;
-        8:  175-block  0
-        -:  176:            }
-        -:  177:        }
+       10:   66:        free(matrix->rows_array);
+       10:   67:        matrix->rows_array = NULL;
+       10:   67-block  0
+        -:   68:    }
+       10:   69:}
+        -:   70:
+        -:   71:// получает конкретный элемент по индексам
+    18033:   72:mat_data_t sp_get(sp_mat_t *matrix, mat_index_t row, mat_index_t col)
+        -:   73:{
+   18033*:   74:    ASSERT_MAT(matrix);
+    18033:   74-block  0
+    %%%%%:   74-block  1
+    18033:   74-block  2
+    18033:   74-block  3
+    18033:   74-block  4
+    %%%%%:   74-block  5
+    18033:   75:    mat_index_t nz_index = matrix->rows_array[row];
+    18033:   76:    mat_index_t nz_last = matrix->rows_array[row + 1];
+        -:   77:
+    31048:   78:    while (nz_index < nz_last && matrix->data_cols[nz_index] < col)
+    18033:   78-block  0
+    31048:   78-block  1
+    26039:   78-block  2
+    13015:   79:        nz_index++;
+    13015:   79-block  0
+        -:   80:
+    18033:   81:    if (nz_index < nz_last && matrix->data_cols[nz_index] == col)
+    18033:   81-block  0
+    13024:   81-block  1
+    10014:   82:        return matrix->data_array[nz_index];
+    10014:   82-block  0
+        -:   83:    else
+     8019:   84:        return 0;
+     8019:   84-block  0
+        -:   85:}
+        -:   86:
+        -:   87:// устанавливает конкретный элемент по индексам
+       39:   88:void sp_set(sp_mat_t *matrix, mat_index_t row, mat_index_t col, mat_data_t value)
+        -:   89:{
+      39*:   90:    ASSERT_MAT(matrix);
+       39:   90-block  0
+    %%%%%:   90-block  1
+       39:   90-block  2
+       39:   90-block  3
+       39:   90-block  4
+    %%%%%:   90-block  5
+        -:   91:
+       39:   92:    mat_index_t nz_index = matrix->rows_array[row];
+       39:   93:    mat_index_t nz_last = matrix->rows_array[row + 1];
+        -:   94:
+       65:   95:    while (nz_index < nz_last && matrix->data_cols[nz_index] < col)
+       39:   95-block  0
+       65:   95-block  1
+       26:   95-block  2
+       26:   96:        nz_index++;
+       26:   96-block  0
+        -:   97:
+      39*:   98:    if (nz_index < nz_last && matrix->data_cols[nz_index] == col)
+       39:   98-block  0
+    %%%%%:   98-block  1
+    #####:   99:        matrix->data_array[nz_index] = value;
+    %%%%%:   99-block  0
+        -:  100:    else
+        -:  101:    {
+       39:  102:        matrix->nz_count++;
+       39:  103:        matrix->data_array = realloc(matrix->data_array, matrix->nz_count * sizeof(mat_data_t));
+       39:  104:        matrix->data_cols = realloc(matrix->data_cols, matrix->nz_count * sizeof(mat_data_t));
+       39:  104-block  0
+        -:  105:
+        -:  106:        mat_data_t temp_elem;
+        -:  107:        mat_index_t temp_col;
+        -:  108:
+        -:  109:        do
+        -:  110:        {
+       39:  111:            temp_elem = matrix->data_array[nz_index];
+       39:  112:            temp_col = matrix->data_cols[nz_index];
+        -:  113:
+       39:  114:            matrix->data_array[nz_index] = value;
+       39:  115:            matrix->data_cols[nz_index] = col;
+        -:  116:
+       39:  117:            value = temp_elem;
+       39:  118:            col = temp_col;
+        -:  119:
+       39:  120:            nz_index++;
+        -:  121:        }
+       39:  122:        while (nz_index < matrix->nz_count);
+       39:  122-block  0
+        -:  123:
+        -:  124:        // обновить список индексов строк
+       92:  125:        while (row++ < matrix->rows)
+       39:  125-block  0
+       92:  125-block  1
+       53:  126:            matrix->rows_array[row]++;
+       53:  126-block  0
+        -:  127:    }
+       39:  128:}
+        -:  129:
+        -:  130:// удаление нулевых элементов из матрицы
+       10:  131:void sp_zip(sp_mat_t *matrix)
+        -:  132:{
+      10*:  133:    ASSERT_MAT(matrix);
+       10:  133-block  0
+    %%%%%:  133-block  1
+       10:  133-block  2
+       10:  133-block  3
+       10:  133-block  4
+    %%%%%:  133-block  5
+        -:  134:
+       10:  135:    mat_index_t z_count = 0;
+       10:  136:    mat_index_t row = 0;
+       27:  137:    for (mat_index_t nz_index = 0; nz_index + z_count < matrix->nz_count; nz_index++)
+       10:  137-block  0
+       27:  137-block  1
+        -:  138:    {
+        -:  139:        // при переходе на следующую строку удаляем из строки все нулевые
+       17:  140:        while (matrix->rows_array[row + 1] <= nz_index + z_count)
+       17:  140-block  0
+       17:  140-block  1
+    #####:  141:            matrix->rows_array[++row] -= z_count;
+    %%%%%:  141-block  0
+        -:  142:
+       17:  143:        if (matrix->data_array[nz_index] == 0) // наш клиент
+       17:  143-block  0
+        -:  144:        {
+        -:  145:            // подбираем заодно всех последующих клиентов
+       10:  146:            mat_index_t strike = 0;
+       28:  147:            while (matrix->data_array[nz_index + strike] == 0)
+       10:  147-block  0
+       28:  147-block  1
+        -:  148:            {
+       18:  149:                z_count++;
+       18:  150:                strike++;
+       18:  150-block  0
+        -:  151:            }
+        -:  152:        }
+        -:  153:
+       17:  154:        matrix->data_array[nz_index] = matrix->data_array[nz_index + z_count];
+       17:  155:        matrix->data_cols[nz_index] = matrix->data_cols[nz_index + z_count];
+       17:  155-block  0
+        -:  156:    }
+        -:  157:
+        -:  158:    // при переходе на следующую строку удаляем из строки все нулевые
+       30:  159:    while (row < matrix->rows + 1)
+       10:  159-block  0
+       30:  159-block  1
+       20:  160:        matrix->rows_array[++row] -= z_count;
+       20:  160-block  0
+        -:  161:
+       10:  162:    matrix->nz_count -= z_count;
+       10:  163:    matrix->data_array = realloc(matrix->data_array, matrix->nz_count * sizeof(mat_data_t));
+       10:  164:    matrix->data_cols = realloc(matrix->data_cols, matrix->nz_count * sizeof(mat_data_t));
+       10:  165:}
+        -:  166:
+        -:  167:// транспозиция матрицы на месте
+        4:  168:void sp_transpose(sp_mat_t *matrix)
+        -:  169:{
+        -:  170:    sp_mat_t new_mat;
+        4:  171:    new_mat.rows = matrix->cols;
+        4:  172:    new_mat.cols = matrix->rows;
+        4:  173:    new_mat.nz_count = matrix->nz_count;
+        -:  174:
+        4:  175:    new_mat.data_array = malloc(new_mat.nz_count * sizeof(mat_data_t));
+        4:  176:    new_mat.data_cols = malloc(new_mat.nz_count * sizeof(mat_index_t));
+        4:  177:    new_mat.rows_array = malloc((new_mat.rows + 1) * sizeof(mat_index_t));
         -:  178:
-        6:  179:        new_mat.rows_array[col + 1] = new_nz_index;
-        6:  179-block  0
-        -:  180:    }
-        -:  181:
-        2:  182:    free(matrix->data_array);
-        2:  183:    free(matrix->data_cols);
-        2:  184:    free(matrix->rows_array);
-        2:  185:    *matrix = new_mat;
-        2:  186:}
-        -:  187:
-        -:  188:// умножение вектора-строки на матрицу (обычный метод)
-        1:  189:int sp_mult_vector_slow(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix, float *time)
-        -:  190:{
-        1:  191:    int status = SUCCESS;
-       1*:  192:    ASSERT_MAT(vector);
-        1:  192-block  0
-    %%%%%:  192-block  1
-        1:  192-block  2
-        1:  192-block  3
-        1:  192-block  4
-    %%%%%:  192-block  5
-       1*:  193:    ASSERT_MAT(matrix);
-        1:  193-block  0
-    %%%%%:  193-block  1
-        1:  193-block  2
-        1:  193-block  3
-        1:  193-block  4
-    %%%%%:  193-block  5
-        -:  194:
-       1*:  195:    assert(vector->rows == 1 && "given matrix is not row-vector");
-        1:  195-block  0
-    %%%%%:  195-block  1
-        -:  196:
-        -:  197:    // проверка на возможность умножить вектор на матрицу
-        1:  198:    if (vector->cols != matrix->rows)
-        1:  198-block  0
-    #####:  199:        status = BAD_MAT_DIMS;
-    %%%%%:  199-block  0
-        -:  200:    else
-        -:  201:    {
-        -:  202:        // создать матрицу под произведение
-        1:  203:        output->rows = 1;
-        1:  204:        output->cols = matrix->cols;
-        1:  205:        output->data_array = calloc(matrix->cols, sizeof(mat_data_t));
-        1:  206:        output->data_cols = malloc(matrix->cols * sizeof(mat_index_t));
-        1:  207:        output->rows_array = malloc(2 * sizeof(mat_index_t));
-        -:  208:
-        1:  209:        START_TIMER;
-        1:  209-block  0
-        -:  210:
-     1001:  211:        for (unsigned int iteration = 0; iteration < mult_iterations; iteration++)
-     1001:  211-block  0
-        -:  212:        {
-        -:  213:            // индекс текущего обрабатываемого элемента матрицы - он же индекс столбца
-     4000:  214:            for (mat_index_t col = 0; col < output->cols; col++)
-     1000:  214-block  0
-     3000:  214-block  1
-     4000:  214-block  2
-        -:  215:            {
-        -:  216:                // настройка индексов столбцов у элементов
-     3000:  217:                output->data_cols[col] = col;
-        -:  218:
-     3000:  219:                output->data_array[col] = 0;
-    12000:  220:                for (mat_index_t row = 0; row < matrix->rows; row++)
-     3000:  220-block  0
-    12000:  220-block  1
-     9000:  221:                    output->data_array[col] += sp_get(vector, 0, row) * sp_get(matrix, row, col);
-     9000:  221-block  0
-        -:  222:            }
-        -:  223:
-        -:  224:            // начало и конец первой и единственной строки
-     1000:  225:            output->rows_array[0] = 0;
-     1000:  226:            output->rows_array[1] = output->cols + 1;
-     1000:  226-block  0
-        -:  227:        }
-        -:  228:
-        1:  229:        END_TIMER;
-        1:  229-block  0
-        -:  230:
-        1:  231:        if (time != NULL)
-        1:  232:            *time = TIMER_MCS / 1000.0f / mult_iterations;
-        1:  232-block  0
-        -:  233:
-        1:  234:        sp_zip(output);
-        1:  234-block  0
-        -:  235:    }
-        -:  236:
-        1:  237:    return status;
-        1:  237-block  0
-        -:  238:}
+        4:  179:    mat_index_t new_nz_index = 0;
+        4:  180:    new_mat.rows_array[0] = 0;
+       17:  181:    for (mat_index_t col = 0; col < matrix->cols; col++)
+        4:  181-block  0
+       17:  181-block  1
+        -:  182:    {
+       58:  183:        for (mat_index_t nz_index = 0; nz_index < matrix->nz_count; nz_index++)
+       13:  183-block  0
+       45:  183-block  1
+       58:  183-block  2
+        -:  184:        {
+       45:  185:            if (INDEX_IN_COL(matrix, col, nz_index))
+       45:  185-block  0
+        -:  186:            {
+        -:  187:                // выяснить индекс строки в старой матрице
+       14:  188:                mat_index_t row = 0;
+       30:  189:                while (!INDEX_IN_ROW(matrix, row, nz_index))
+       14:  189-block  0
+       30:  189-block  1
+       30:  189-block  2
+       16:  190:                    row++;
+       16:  190-block  0
+        -:  191:
+        -:  192:                // записать этот элемент в транспонированную матрицу
+       14:  193:                new_mat.data_array[new_nz_index] = matrix->data_array[nz_index];
+       14:  194:                new_mat.data_cols[new_nz_index] = row;
+       14:  195:                new_nz_index++;
+       14:  195-block  0
+        -:  196:            }
+        -:  197:        }
+        -:  198:
+       13:  199:        new_mat.rows_array[col + 1] = new_nz_index;
+       13:  199-block  0
+        -:  200:    }
+        -:  201:
+        4:  202:    free(matrix->data_array);
+        4:  203:    free(matrix->data_cols);
+        4:  204:    free(matrix->rows_array);
+        4:  205:    *matrix = new_mat;
+        4:  206:}
+        -:  207:
+        -:  208:// умножение вектора-строки на матрицу (обычный метод)
+        1:  209:int sp_mult_vector_slow(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix, float *time)
+        -:  210:{
+        1:  211:    int status = SUCCESS;
+       1*:  212:    ASSERT_MAT(vector);
+        1:  212-block  0
+    %%%%%:  212-block  1
+        1:  212-block  2
+        1:  212-block  3
+        1:  212-block  4
+    %%%%%:  212-block  5
+       1*:  213:    ASSERT_MAT(matrix);
+        1:  213-block  0
+    %%%%%:  213-block  1
+        1:  213-block  2
+        1:  213-block  3
+        1:  213-block  4
+    %%%%%:  213-block  5
+        -:  214:
+       1*:  215:    assert(vector->rows == 1 && "given matrix is not row-vector");
+        1:  215-block  0
+    %%%%%:  215-block  1
+        -:  216:
+        -:  217:    // проверка на возможность умножить вектор на матрицу
+        1:  218:    if (vector->cols != matrix->rows)
+        1:  218-block  0
+    #####:  219:        status = BAD_MAT_DIMS;
+    %%%%%:  219-block  0
+        -:  220:    else
+        -:  221:    {
+        -:  222:        // создать матрицу под произведение
+        1:  223:        output->rows = 1;
+        1:  224:        output->cols = matrix->cols;
+        1:  225:        output->nz_count = output->cols;
+        1:  226:        output->data_array = calloc(matrix->cols, sizeof(mat_data_t));
+        1:  227:        output->data_cols = malloc(matrix->cols * sizeof(mat_index_t));
+        1:  228:        output->rows_array = malloc(2 * sizeof(mat_index_t));
+        -:  229:
+        1:  230:        START_TIMER;
+        1:  230-block  0
+        -:  231:
+     1001:  232:        for (unsigned int iteration = 0; iteration < mult_iterations; iteration++)
+     1001:  232-block  0
+        -:  233:        {
+        -:  234:            // индекс текущего обрабатываемого элемента матрицы - он же индекс столбца
+     4000:  235:            for (mat_index_t col = 0; col < output->cols; col++)
+     1000:  235-block  0
+     3000:  235-block  1
+     4000:  235-block  2
+        -:  236:            {
+        -:  237:                // настройка индексов столбцов у элементов
+     3000:  238:                output->data_cols[col] = col;
         -:  239:
-        -:  240:// умножение вектора-строки на матрицу (эффективный метод)
-        1:  241:int sp_mult_vector_fast(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix, float *time)
-        -:  242:{
-        1:  243:    int status = SUCCESS;
-       1*:  244:    ASSERT_MAT(vector);
-        1:  244-block  0
-    %%%%%:  244-block  1
-        1:  244-block  2
-        1:  244-block  3
-        1:  244-block  4
-    %%%%%:  244-block  5
-       1*:  245:    ASSERT_MAT(matrix);
-        1:  245-block  0
-    %%%%%:  245-block  1
-        1:  245-block  2
-        1:  245-block  3
-        1:  245-block  4
-    %%%%%:  245-block  5
-        -:  246:
-       1*:  247:    assert(vector->rows == 1 && "given matrix is not row-vector");
-        1:  247-block  0
-    %%%%%:  247-block  1
-        -:  248:
-        -:  249:    // проверка на возможность умножить вектор на матрицу
-        1:  250:    if (vector->cols != matrix->rows)
+     3000:  240:                output->data_array[col] = 0;
+    12000:  241:                for (mat_index_t row = 0; row < matrix->rows; row++)
+     3000:  241-block  0
+    12000:  241-block  1
+     9000:  242:                    output->data_array[col] += sp_get(vector, 0, row) * sp_get(matrix, row, col);
+     9000:  242-block  0
+        -:  243:            }
+        -:  244:
+        -:  245:            // начало и конец первой и единственной строки
+     1000:  246:            output->rows_array[0] = 0;
+     1000:  247:            output->rows_array[1] = output->cols + 1;
+     1000:  247-block  0
+        -:  248:        }
+        -:  249:
+        1:  250:        END_TIMER;
         1:  250-block  0
-    #####:  251:        status = BAD_MAT_DIMS;
-    %%%%%:  251-block  0
-        -:  252:    else
-        -:  253:    {
-        -:  254:        // создать матрицу под произведение
-        1:  255:        output->rows = 1;
-        1:  256:        output->cols = matrix->cols;
-        1:  257:        output->data_array = calloc(matrix->cols, sizeof(mat_data_t));
-        1:  258:        output->data_cols = malloc(matrix->cols * sizeof(mat_index_t));
-        1:  259:        output->rows_array = malloc(2 * sizeof(mat_index_t));
+        -:  251:
+        1:  252:        if (time != NULL)
+        1:  253:            *time = TIMER_MCS / 1000.0f / mult_iterations;
+        1:  253-block  0
+        -:  254:
+        1:  255:        sp_zip(output);
+        1:  255-block  0
+        -:  256:    }
+        -:  257:
+        1:  258:    return status;
+        1:  258-block  0
+        -:  259:}
         -:  260:
-        -:  261:        // транспонировать исходную матрицу
-        1:  262:        sp_transpose(matrix);
-        1:  262-block  0
-        -:  263:
-        1:  264:        START_TIMER;
-        -:  265:
-     1001:  266:        for (unsigned int iteration = 0; iteration < mult_iterations; iteration++)
-     1001:  266-block  0
-        -:  267:        {
-        -:  268:            // индекс текущего обрабатываемого элемента матрицы - он же индекс столбца
-     4000:  269:            for (mat_index_t nz_index = 0; nz_index < output->cols; nz_index++)
-     1000:  269-block  0
-     4000:  269-block  1
-        -:  270:            {
-        -:  271:                // настройка индексов столбцов у элементов
-     3000:  272:                output->data_cols[nz_index] = nz_index;
-        -:  273:
-        -:  274:                // предустановка индексов для обхода
-     3000:  275:                mat_index_t nz_mat_index = matrix->rows_array[nz_index];
-     3000:  276:                mat_index_t nz_vec_index = 0;
-     3000:  277:                mat_index_t nz_mat_index_end = matrix->rows_array[nz_index + 1];
-     3000:  278:                mat_index_t nz_vec_index_end = vector->nz_count;
-        -:  279:
-     3000:  280:                mat_data_t sum = 0;
-        -:  281:
-        -:  282:                // пока не дошли до конца хотябы одной из строк матриц
-     7000:  283:                while (nz_mat_index < nz_mat_index_end && nz_vec_index < nz_vec_index_end)
-     3000:  283-block  0
-     7000:  283-block  1
-     4000:  283-block  2
-        -:  284:                {
-        -:  285:                    // находим ближайшую пару индексов nz_vec_index и nz_mat_index с одинаковыми индексами столбцов
-    10000:  286:                    while (vector->data_cols[nz_vec_index] < matrix->data_cols[nz_mat_index])
-     4000:  286-block  0
-    10000:  286-block  1
-     6000:  287:                        nz_vec_index++;
-     6000:  287-block  0
-        -:  288:
-    13000:  289:                    while (vector->data_cols[nz_vec_index] > matrix->data_cols[nz_mat_index])
-     4000:  289-block  0
-    13000:  289-block  1
-     9000:  290:                        nz_mat_index++;
-     9000:  290-block  0
-        -:  291:
-        -:  292:                    // если нашли, добавляем произведение к сумме и увеличиваем оба индекса
-     4000:  293:                    if (nz_vec_index < nz_vec_index_end && nz_mat_index < nz_mat_index_end && vector->data_cols[nz_vec_index] == matrix->data_cols[nz_mat_index])
-     4000:  293-block  0
-     3000:  293-block  1
-     3000:  293-block  2
-     3000:  294:                        sum += vector->data_array[nz_vec_index] * matrix->data_array[nz_mat_index];
-     3000:  294-block  0
+        -:  261:// умножение вектора-строки на матрицу (эффективный метод)
+        2:  262:int sp_mult_vector_fast(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix, float *time)
+        -:  263:{
+        2:  264:    int status = SUCCESS;
+       2*:  265:    ASSERT_MAT(vector);
+        2:  265-block  0
+    %%%%%:  265-block  1
+        2:  265-block  2
+        2:  265-block  3
+        2:  265-block  4
+    %%%%%:  265-block  5
+       2*:  266:    ASSERT_MAT(matrix);
+        2:  266-block  0
+    %%%%%:  266-block  1
+        2:  266-block  2
+        2:  266-block  3
+        2:  266-block  4
+    %%%%%:  266-block  5
+        -:  267:
+       2*:  268:    assert(vector->rows == 1 && "given matrix is not row-vector");
+        2:  268-block  0
+    %%%%%:  268-block  1
+        -:  269:
+        -:  270:    // проверка на возможность умножить вектор на матрицу
+        2:  271:    if (vector->cols != matrix->rows)
+        2:  271-block  0
+    #####:  272:        status = BAD_MAT_DIMS;
+    %%%%%:  272-block  0
+        -:  273:    else
+        -:  274:    {
+        -:  275:        // создать матрицу под произведение
+        2:  276:        output->rows = 1;
+        2:  277:        output->cols = matrix->cols;
+        2:  278:        output->nz_count = output->cols;
+        2:  279:        output->data_array = calloc(matrix->cols, sizeof(mat_data_t));
+        2:  280:        output->data_cols = malloc(matrix->cols * sizeof(mat_index_t));
+        2:  281:        output->rows_array = malloc(2 * sizeof(mat_index_t));
+        -:  282:
+        -:  283:        // транспонировать исходную матрицу
+        2:  284:        sp_transpose(matrix);
+        2:  284-block  0
+        -:  285:
+        2:  286:        START_TIMER;
+        -:  287:
+     2002:  288:        for (unsigned int iteration = 0; iteration < mult_iterations; iteration++)
+     2002:  288-block  0
+        -:  289:        {
+        -:  290:            // индекс текущего обрабатываемого элемента матрицы - он же индекс столбца
+     8000:  291:            for (mat_index_t nz_index = 0; nz_index < output->cols; nz_index++)
+     2000:  291-block  0
+     8000:  291-block  1
+        -:  292:            {
+        -:  293:                // настройка индексов столбцов у элементов
+     6000:  294:                output->data_cols[nz_index] = nz_index;
         -:  295:
-     4000:  296:                    nz_vec_index++;
-     4000:  297:                    nz_mat_index++;
-     4000:  297-block  0
-        -:  298:                }
-        -:  299:
-     3000:  300:                output->data_array[nz_index] = sum;
-     3000:  300-block  0
-        -:  301:            }
-        -:  302:
-        -:  303:            // начало и конец первой и единственной строки
-     1000:  304:            output->rows_array[0] = 0;
-     1000:  305:            output->rows_array[1] = output->cols + 1;
-     1000:  305-block  0
-        -:  306:        }
-        -:  307:
-        1:  308:        END_TIMER;
-        1:  308-block  0
-        -:  309:
-        1:  310:        if (time != NULL)
-        1:  311:            *time = TIMER_MCS / 1000.0f / mult_iterations;
-        1:  311-block  0
-        -:  312:
-        1:  313:        sp_zip(output);
-        1:  313-block  0
-        -:  314:
-        -:  315:        // транспонировать исходную матрицу обратно
-        1:  316:        sp_transpose(matrix);
-        -:  317:    }
-        -:  318:
-        1:  319:    return status;
-        1:  319-block  0
-        -:  320:}
+        -:  296:                // предустановка индексов для обхода
+     6000:  297:                mat_index_t nz_mat_index = matrix->rows_array[nz_index];
+     6000:  298:                mat_index_t nz_vec_index = 0;
+     6000:  299:                mat_index_t nz_mat_index_end = matrix->rows_array[nz_index + 1];
+     6000:  300:                mat_index_t nz_vec_index_end = vector->nz_count;
+        -:  301:
+     6000:  302:                mat_data_t sum = 0;
+        -:  303:
+        -:  304:                // пока не дошли до конца хотябы одной из строк матриц
+    15000:  305:                while (nz_mat_index < nz_mat_index_end && nz_vec_index < nz_vec_index_end)
+     6000:  305-block  0
+    15000:  305-block  1
+    10000:  305-block  2
+        -:  306:                {
+        -:  307:                    // находим ближайшую пару индексов nz_vec_index и nz_mat_index с одинаковыми индексами столбцов
+     9000:  308:                    if (vector->data_cols[nz_vec_index] < matrix->data_cols[nz_mat_index])
+     9000:  308-block  0
+     3000:  309:                        nz_vec_index++;
+     3000:  309-block  0
+     6000:  310:                    else if (vector->data_cols[nz_vec_index] > matrix->data_cols[nz_mat_index])
+     6000:  310-block  0
+     2000:  311:                        nz_mat_index++;
+     2000:  311-block  0
+        -:  312:                    else
+        -:  313:                    {
+        -:  314:                        // если нашли, добавляем произведение к сумме и увеличиваем оба индекса
+     4000:  315:                        sum += vector->data_array[nz_vec_index] * matrix->data_array[nz_mat_index];
+        -:  316:
+     4000:  317:                        nz_vec_index++;
+     4000:  318:                        nz_mat_index++;
+     4000:  318-block  0
+        -:  319:                    }
+        -:  320:                }
+        -:  321:
+     6000:  322:                output->data_array[nz_index] = sum;
+     6000:  322-block  0
+        -:  323:            }
+        -:  324:
+        -:  325:            // начало и конец первой и единственной строки
+     2000:  326:            output->rows_array[0] = 0;
+     2000:  327:            output->rows_array[1] = output->cols + 1;
+     2000:  327-block  0
+        -:  328:        }
+        -:  329:
+        2:  330:        END_TIMER;
+        2:  330-block  0
+        -:  331:
+        2:  332:        if (time != NULL)
+        2:  333:            *time = TIMER_MCS / 1000.0f / mult_iterations;
+        2:  333-block  0
+        -:  334:
+        2:  335:        sp_zip(output);
+        2:  335-block  0
+        -:  336:
+        -:  337:        // транспонировать исходную матрицу обратно
+        2:  338:        sp_transpose(matrix);
+        -:  339:    }
+        -:  340:
+        2:  341:    return status;
+        2:  341-block  0
+        -:  342:}

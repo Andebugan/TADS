@@ -32,61 +32,61 @@
         -:   31:#define INDEX_IN_POS(matrix, row, col, index) (INDEX_IN_ROW(matrix, row, index) && INDEX_IN_COL(matrix, col, index))
         -:   32:
         -:   33:// перевод из плотного представления
-        1:   34:sp_mat_t sp_from_dense(mat_data_t **dense, mat_index_t rows, mat_index_t cols)
+       10:   34:sp_mat_t sp_from_dense(mat_data_t **dense, mat_index_t rows, mat_index_t cols)
         -:   35:{
-        1:   36:    sp_mat_t matrix = sp_zero(rows, cols);
-        1:   36-block  0
+       10:   36:    sp_mat_t matrix = sp_zero(rows, cols);
+       10:   36-block  0
         -:   37:
-        2:   38:    for (mat_index_t row = 0; row < rows; row++)
-        1:   38-block  0
-        2:   38-block  1
-        2:   39:        for (mat_index_t col = 0; col < cols; col++)
-        1:   39-block  0
-        1:   39-block  1
-        2:   39-block  2
-        1:   40:            if (dense[row][col] != 0)
-        1:   40-block  0
-        1:   41:                sp_set(&matrix, row, col, dense[row][col]);
-        1:   41-block  0
+       20:   38:    for (mat_index_t row = 0; row < rows; row++)
+       10:   38-block  0
+       20:   38-block  1
+       20:   39:        for (mat_index_t col = 0; col < cols; col++)
+       10:   39-block  0
+       10:   39-block  1
+       20:   39-block  2
+       10:   40:            if (dense[row][col] != 0)
+       10:   40-block  0
+       10:   41:                sp_set(&matrix, row, col, dense[row][col]);
+       10:   41-block  0
         -:   42:
-        1:   43:    return matrix;
-        1:   43-block  0
+       10:   43:    return matrix;
+       10:   43-block  0
         -:   44:}
         -:   45:
         -:   46:// считывает строку чисел и возвращает динамический массив
         -:   47:// если значение cols было равно 0, то устанавливает в кол-во чисел в строке
         -:   48:// иначе - если оно не равно кол-ву чисел в строке - вернёт NULL
-        1:   49:static mat_data_t *parse_line(char *line, mat_index_t *cols)
+       10:   49:static mat_data_t *parse_line(char *line, mat_index_t *cols)
         -:   50:{
-        1:   51:    int status = SUCCESS;
+       10:   51:    int status = SUCCESS;
         -:   52:
-        1:   53:    mat_data_t *array = malloc(sizeof(mat_data_t));
-        1:   54:    mat_index_t count = 0;
+       10:   53:    mat_data_t *array = malloc(sizeof(mat_data_t));
+       10:   54:    mat_index_t count = 0;
         -:   55:
         -:   56:    // пройти по строке функцией strtok
-        1:   57:    char *token = strtok(line, " \t\n");
-        1:   57-block  0
-        2:   58:    while (status == SUCCESS && token != NULL)
-        2:   58-block  0
-        2:   58-block  1
+       10:   57:    char *token = strtok(line, " \t\n");
+       10:   57-block  0
+       20:   58:    while (status == SUCCESS && token != NULL)
+       20:   58-block  0
+       20:   58-block  1
         -:   59:    {
         -:   60:        char c;
         -:   61:
-        1:   62:        if (sscanf(token, MAT_DATA_SCN_FMT "%c", array + count, &c) != 1)
-        1:   62-block  0
+       10:   62:        if (sscanf(token, MAT_DATA_SCN_FMT "%c", array + count, &c) != 1)
+       10:   62-block  0
     #####:   63:            status = BAD_FSCANF;
     %%%%%:   63-block  0
         -:   64:        else
         -:   65:        {
-        1:   66:            array = realloc(array, (++count + 1) * sizeof(mat_data_t));
-        1:   67:            token = strtok(NULL, " \t\n");
-        1:   67-block  0
+       10:   66:            array = realloc(array, (++count + 1) * sizeof(mat_data_t));
+       10:   67:            token = strtok(NULL, " \t\n");
+       10:   67-block  0
         -:   68:        }
         -:   69:    }
         -:   70:
-       1*:   71:    if (status != SUCCESS || (*cols != 0 && *cols != count))
-        1:   71-block  0
-        1:   71-block  1
+      10*:   71:    if (status != SUCCESS || (*cols != 0 && *cols != count))
+       10:   71-block  0
+       10:   71-block  1
     %%%%%:   71-block  2
         -:   72:    {
     #####:   73:        free(array);
@@ -94,66 +94,66 @@
     %%%%%:   74-block  0
         -:   75:    }
         -:   76:
-        1:   77:    *cols = count;
-        1:   78:    return array;
-        1:   78-block  0
+       10:   77:    *cols = count;
+       10:   78:    return array;
+       10:   78-block  0
         -:   79:}
         -:   80:
         -:   81:// ввод матрицы в виде матрицы
-        2:   82:int sp_scanf(FILE *file, sp_mat_t *matrix)
+       20:   82:int sp_scanf(FILE *file, sp_mat_t *matrix)
         -:   83:{
-        2:   84:    int status = SUCCESS;
+       20:   84:    int status = SUCCESS;
         -:   85:
-        2:   86:    mat_index_t rows = 0;
-        2:   87:    mat_index_t cols = 0;
-        2:   88:    mat_data_t **dense_matrix = NULL;
+       20:   86:    mat_index_t rows = 0;
+       20:   87:    mat_index_t cols = 0;
+       20:   88:    mat_data_t **dense_matrix = NULL;
         -:   89:
-        2:   90:    char *line = NULL;
-        2:   91:    size_t line_size = 0;
+       20:   90:    char *line = NULL;
+       20:   91:    size_t line_size = 0;
         -:   92:
-        3:   93:    while (status == SUCCESS && getline(&line, &line_size, file) >= 0)
-        2:   93-block  0
-        3:   93-block  1
-        3:   93-block  2
+       30:   93:    while (status == SUCCESS && getline(&line, &line_size, file) >= 0)
+       20:   93-block  0
+       30:   93-block  1
+       30:   93-block  2
         -:   94:    {
-        1:   95:        dense_matrix = realloc(dense_matrix, (rows + 1) * sizeof(mat_data_t *));
-        1:   96:        dense_matrix[rows] = parse_line(line, &cols);
-        1:   96-block  0
-        1:   97:        if (dense_matrix[rows] == NULL)
+       10:   95:        dense_matrix = realloc(dense_matrix, (rows + 1) * sizeof(mat_data_t *));
+       10:   96:        dense_matrix[rows] = parse_line(line, &cols);
+       10:   96-block  0
+       10:   97:        if (dense_matrix[rows] == NULL)
     #####:   98:            status = BAD_FSCANF;
     %%%%%:   98-block  0
         -:   99:        else
-        1:  100:            rows++;
-        1:  100-block  0
+       10:  100:            rows++;
+       10:  100-block  0
         -:  101:    }
         -:  102:
-        2:  103:    free(line);
+       20:  103:    free(line);
         -:  104:
-        2:  105:    if (cols == 0 || rows == 0)
-        2:  105-block  0
-        1:  105-block  1
-        1:  106:        status = BAD_FILE;
-        1:  106-block  0
+       20:  105:    if (cols == 0 || rows == 0)
+       20:  105-block  0
+       10:  105-block  1
+       10:  106:        status = BAD_FILE;
+       10:  106-block  0
         -:  107:
-        2:  108:    if (status == SUCCESS)
-        2:  108-block  0
-        1:  109:        *matrix = sp_from_dense(dense_matrix, rows, cols);
-        1:  109-block  0
+       20:  108:    if (status == SUCCESS)
+       20:  108-block  0
+       10:  109:        *matrix = sp_from_dense(dense_matrix, rows, cols);
+       10:  109-block  0
         -:  110:
-        2:  111:    if (dense_matrix != NULL)
-        2:  111-block  0
+       20:  111:    if (dense_matrix != NULL)
+       20:  111-block  0
         -:  112:    {
-        2:  113:        for (mat_index_t row = 0; row < rows; row++)
-        1:  113-block  0
-        2:  113-block  1
-        1:  114:            free(dense_matrix[row]);
-        1:  114-block  0
-        1:  115:        free(dense_matrix);
-        1:  115-block  0
+       20:  113:        for (mat_index_t row = 0; row < rows; row++)
+       10:  113-block  0
+       20:  113-block  1
+       10:  114:            free(dense_matrix[row]);
+       10:  114-block  0
+       10:  115:        free(dense_matrix);
+       10:  115-block  0
         -:  116:    }
         -:  117:
-        2:  118:    return status;
-        2:  118-block  0
+       20:  118:    return status;
+       20:  118-block  0
         -:  119:}
         -:  120:
         -:  121:// ввод матрицы в координатной форме
@@ -277,84 +277,84 @@
         -:  186:}
         -:  187:
         -:  188:// вывод матрицы в виде трёх векторов
-    #####:  189:int sp_print_raw(FILE *file, sp_mat_t *matrix)
+        7:  189:int sp_print_raw(FILE *file, sp_mat_t *matrix)
         -:  190:{
-    #####:  191:    int status = SUCCESS;
+        7:  191:    int status = SUCCESS;
         -:  192:
-    #####:  193:    SAFE_FPRINTF(file, "A: [");
-    %%%%%:  193-block  0
-    %%%%%:  193-block  1
+       7*:  193:    SAFE_FPRINTF(file, "A: [");
+        7:  193-block  0
+        7:  193-block  1
     %%%%%:  193-block  2
         -:  194:
-    #####:  195:    for (mat_index_t nz_index = 0; nz_index < matrix->nz_count; nz_index++)
-    %%%%%:  195-block  0
-    %%%%%:  195-block  1
-    %%%%%:  195-block  2
+       16:  195:    for (mat_index_t nz_index = 0; nz_index < matrix->nz_count; nz_index++)
+        7:  195-block  0
+        9:  195-block  1
+       16:  195-block  2
         -:  196:    {
-    #####:  197:        if (nz_index > 0)
-    %%%%%:  197-block  0
-    #####:  198:            SAFE_FPRINTF(file, ", ");
-    %%%%%:  198-block  0
-    %%%%%:  198-block  1
+        9:  197:        if (nz_index > 0)
+        9:  197-block  0
+       2*:  198:            SAFE_FPRINTF(file, ", ");
+        2:  198-block  0
+        2:  198-block  1
     %%%%%:  198-block  2
         -:  199:
-    #####:  200:        SAFE_FPRINTF(file, "%d", (int)matrix->data_array[nz_index]);
-    %%%%%:  200-block  0
-    %%%%%:  200-block  1
+       9*:  200:        SAFE_FPRINTF(file, "%d", (int)matrix->data_array[nz_index]);
+        9:  200-block  0
+        9:  200-block  1
     %%%%%:  200-block  2
         -:  201:    }
         -:  202:
-    #####:  203:    SAFE_FPRINTF(file, "]\nJA: [");
-    %%%%%:  203-block  0
-    %%%%%:  203-block  1
+       7*:  203:    SAFE_FPRINTF(file, "]\nJA: [");
+        7:  203-block  0
+        7:  203-block  1
     %%%%%:  203-block  2
         -:  204:
-    #####:  205:    for (mat_index_t nz_index = 0; nz_index < matrix->nz_count; nz_index++)
-    %%%%%:  205-block  0
-    %%%%%:  205-block  1
-    %%%%%:  205-block  2
+       16:  205:    for (mat_index_t nz_index = 0; nz_index < matrix->nz_count; nz_index++)
+        7:  205-block  0
+        9:  205-block  1
+       16:  205-block  2
         -:  206:    {
-    #####:  207:        if (nz_index > 0)
-    %%%%%:  207-block  0
-    #####:  208:            SAFE_FPRINTF(file, ", ");
-    %%%%%:  208-block  0
-    %%%%%:  208-block  1
+        9:  207:        if (nz_index > 0)
+        9:  207-block  0
+       2*:  208:            SAFE_FPRINTF(file, ", ");
+        2:  208-block  0
+        2:  208-block  1
     %%%%%:  208-block  2
         -:  209:
-    #####:  210:        SAFE_FPRINTF(file, "%u", (unsigned int)matrix->data_cols[nz_index]);
-    %%%%%:  210-block  0
-    %%%%%:  210-block  1
+       9*:  210:        SAFE_FPRINTF(file, "%u", (unsigned int)matrix->data_cols[nz_index]);
+        9:  210-block  0
+        9:  210-block  1
     %%%%%:  210-block  2
         -:  211:    }
         -:  212:
-    #####:  213:    SAFE_FPRINTF(file, "]\nIA: [");
-    %%%%%:  213-block  0
-    %%%%%:  213-block  1
+       7*:  213:    SAFE_FPRINTF(file, "]\nIA: [");
+        7:  213-block  0
+        7:  213-block  1
     %%%%%:  213-block  2
         -:  214:
-    #####:  215:    for (mat_index_t row = 0; row < matrix->rows + 1; row++)
-    %%%%%:  215-block  0
-    %%%%%:  215-block  1
-    %%%%%:  215-block  2
+       21:  215:    for (mat_index_t row = 0; row < matrix->rows + 1; row++)
+        7:  215-block  0
+       14:  215-block  1
+       21:  215-block  2
         -:  216:    {
-    #####:  217:        if (row > 0)
-    %%%%%:  217-block  0
-    #####:  218:            SAFE_FPRINTF(file, ", ");
-    %%%%%:  218-block  0
-    %%%%%:  218-block  1
+       14:  217:        if (row > 0)
+       14:  217-block  0
+       7*:  218:            SAFE_FPRINTF(file, ", ");
+        7:  218-block  0
+        7:  218-block  1
     %%%%%:  218-block  2
         -:  219:
-    #####:  220:        SAFE_FPRINTF(file, "%u", (unsigned int)matrix->rows_array[row]);
-    %%%%%:  220-block  0
-    %%%%%:  220-block  1
+      14*:  220:        SAFE_FPRINTF(file, "%u", (unsigned int)matrix->rows_array[row]);
+       14:  220-block  0
+       14:  220-block  1
     %%%%%:  220-block  2
         -:  221:    }
         -:  222:
-    #####:  223:    SAFE_FPRINTF(file, "]\n");
-    %%%%%:  223-block  0
-    %%%%%:  223-block  1
+       7*:  223:    SAFE_FPRINTF(file, "]\n");
+        7:  223-block  0
+        7:  223-block  1
     %%%%%:  223-block  2
         -:  224:
-    #####:  225:    return status;
-    %%%%%:  225-block  0
+        7:  225:    return status;
+        7:  225-block  0
         -:  226:}

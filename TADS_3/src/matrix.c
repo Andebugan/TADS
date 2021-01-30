@@ -138,10 +138,18 @@ void sp_zip(sp_mat_t *matrix)
     {
         // при переходе на следующую строку удаляем из строки все нулевые
         while (matrix->rows_array[row + 1] <= nz_index + z_count)
-            matrix->rows_array[++row] -= z_count; 
+            matrix->rows_array[++row] -= z_count;
 
         if (matrix->data_array[nz_index] == 0) // наш клиент
-            z_count++;
+        {
+            // подбираем заодно всех последующих клиентов
+            mat_index_t strike = 0;
+            while (matrix->data_array[nz_index + strike] == 0)
+            {
+                z_count++;
+                strike++;
+            }
+        }
 
         matrix->data_array[nz_index] = matrix->data_array[nz_index + z_count];
         matrix->data_cols[nz_index] = matrix->data_cols[nz_index + z_count];
@@ -149,7 +157,7 @@ void sp_zip(sp_mat_t *matrix)
 
     // при переходе на следующую строку удаляем из строки все нулевые
     while (row < matrix->rows + 1)
-        matrix->rows_array[++row] -= z_count; 
+        matrix->rows_array[++row] -= z_count;
 
     matrix->nz_count -= z_count;
     matrix->data_array = realloc(matrix->data_array, matrix->nz_count * sizeof(mat_data_t));
@@ -297,18 +305,18 @@ int sp_mult_vector_fast(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix, fl
                 while (nz_mat_index < nz_mat_index_end && nz_vec_index < nz_vec_index_end)
                 {
                     // находим ближайшую пару индексов nz_vec_index и nz_mat_index с одинаковыми индексами столбцов
-                    while (vector->data_cols[nz_vec_index] < matrix->data_cols[nz_mat_index])
+                    if (vector->data_cols[nz_vec_index] < matrix->data_cols[nz_mat_index])
                         nz_vec_index++;
-
-                    while (vector->data_cols[nz_vec_index] > matrix->data_cols[nz_mat_index])
+                    else if (vector->data_cols[nz_vec_index] > matrix->data_cols[nz_mat_index])
                         nz_mat_index++;
-
-                    // если нашли, добавляем произведение к сумме и увеличиваем оба индекса
-                    if (nz_vec_index < nz_vec_index_end && nz_mat_index < nz_mat_index_end && vector->data_cols[nz_vec_index] == matrix->data_cols[nz_mat_index])
+                    else
+                    {
+                        // если нашли, добавляем произведение к сумме и увеличиваем оба индекса
                         sum += vector->data_array[nz_vec_index] * matrix->data_array[nz_mat_index];
 
-                    nz_vec_index++;
-                    nz_mat_index++;
+                        nz_vec_index++;
+                        nz_mat_index++;
+                    }
                 }
 
                 output->data_array[nz_index] = sum;
