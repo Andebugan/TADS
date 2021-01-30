@@ -235,7 +235,6 @@ int sp_mult_vector_slow(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix, fl
         output->data_array = calloc(matrix->cols, sizeof(mat_data_t));
         output->data_cols = malloc(matrix->cols * sizeof(mat_index_t));
         output->rows_array = malloc(2 * sizeof(mat_index_t));
-        output->nz_count = 0;
 
         START_TIMER;
 
@@ -244,7 +243,6 @@ int sp_mult_vector_slow(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix, fl
             // Индекс обрабатываемого элемента матрицы - это же индекс столбца
             for (mat_index_t col = 0; col < output->cols; col++)
             {
-                output->nz_count++;
                 // Настройка индекса стоблцов у элементов
                 output->data_cols[col] = col;
 
@@ -256,17 +254,15 @@ int sp_mult_vector_slow(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix, fl
             // Начало и конец первой и единственной строки
             output->rows_array[0] = 0;
             output->rows_array[1] = output->cols + 1;
+            output->nz_count = output->cols + 1;
         }
-
         END_TIMER;
-
         // Замер времени
         if (time != NULL)
             *time = TIMER_MCS / 1000.0f / mult_iterations;
 
         sp_zip(output);
     }
-
     return status;
 }
 
@@ -287,6 +283,7 @@ int sp_mult_vector_fast(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix, fl
         // Создание матрицы под произведение
         output->rows = 1;
         output->cols = matrix->cols;
+        output->nz_count = output->cols + 1;
         output->data_array = calloc(matrix->cols, sizeof(mat_data_t));
         output->data_cols = malloc(matrix->cols * sizeof(mat_index_t));
         output->rows_array = malloc(2 * sizeof(mat_index_t));
@@ -337,7 +334,6 @@ int sp_mult_vector_fast(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix, fl
             output->rows_array[0] = 0;
             output->rows_array[1] = output->cols + 1;
         }
-
         END_TIMER;
 
         if (time != NULL)

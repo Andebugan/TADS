@@ -56,16 +56,152 @@ static void show_main_menu(void)
         "  13. Сравнить время выполнения операций и объем памяти при использовании\n"
         "     этих 2-х алгоритмов при различном проценте заполнения матриц.\n"
         "  14. Вывести вектор на экран\n"
+        "  15. Сгенерировать вектор с заданными размерностью и процентом заполнения\n"
         YELLOW
         "  0. Выйти\n" RESET
         CYAN "> " RESET);
 }
 
-// Генерация матрицы 
-int sp_mat_gen(void)
+
+mat_data_t get_rand_range_int(mat_data_t min, mat_data_t max) {
+    return rand() % (max - min + 1) + min;
+}
+
+// Генерация матрицы с элементами от max_elem до min_elem
+int sp_mat_gen(sp_mat_t *matrix)
 {
     int status = SUCCESS;
+    int rows = 0;
+    int cols = 0;
+    int elem_proz = 0;
+    mat_data_t max_elem = 0;
+    mat_data_t min_elem = 0;
+    printf(CYAN "Формат ввода:\n" RESET
+    YELLOW
+    "Сначала вводится размерность матрицы и процент заполнения {i} {j} {proz}\n"
+    "Размерность - целые числа в интервале [1, ");
+    printf("%i", MAX_MATR_SIZE);
+    printf("]\nПроцент заполнения - целое число в интервале [0, 100]\n");
+    printf("Затем вводятся ограничения для значения элемента в формате {min} {max}, где max и min целые числа\n"
+    "типа long long int\n"
+    "Если нужно, чтобы матрица была заполнена одним значением, от max = min\n");
 
+    printf (YELLOW "Введите размерность матрицы и процент заполнения: " RESET);
+    if (fscanf(stdin, "%d %d %d", &rows, &cols, &elem_proz) != 3 || ((rows > MAX_MATR_SIZE || rows <= 0)\
+     || (cols > MAX_MATR_SIZE || cols <= 0) || (elem_proz < 0) || (elem_proz > 100)))
+    {
+        status = BAD_MAT_DIMS;
+        printf(RED "<!> Ошибка, размеры матрицы не соответствуют условию\n" RESET);
+    }
+    else
+    {
+        *matrix = sp_zero(rows, cols);
+        if (matrix != NULL)
+        {
+            printf(GREEN "Матрица успешно инициализирована\n" RESET);
+            printf (YELLOW "Введите ограничения для значений элементов:\n" RESET);
+            if (fscanf(stdin, "%lld %lld", &min_elem, &max_elem) != 2 || max_elem < min_elem)
+            {
+                status = BAD_FSCANF;
+                printf(RED "<!> Ошибка, диапазон значений введён некорректно\n" RESET);
+            }
+        }
+        else
+        {
+            printf(RED "<!> Ошибка при выделении памяти, попробуйте ещё раз\n" RESET);
+            status = FAILURE;
+        }
+    }
+
+    if (status == SUCCESS)  
+    {
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                mat_data_t new_elem = 0;
+                while (new_elem == 0)
+                    new_elem = get_rand_range_int(min_elem, max_elem);
+                
+                if (get_rand_range_int(0, 100) <= elem_proz)
+                    sp_set(matrix, i, j, new_elem);
+            }
+        }
+    }
+    if (status == SUCCESS)
+        printf(GREEN "Матрица успешно сгенерирована\n" RESET);
+    clean_input_stream();
+    if (status != FAILURE)
+        status = SUCCESS;
+    return status;
+}
+
+// Генерация вектора с элементами от max_elem до min_elem
+int sp_mat_gen_vec(sp_mat_t *matrix)
+{
+    int status = SUCCESS;
+    int rows = 1;
+    int cols = 0;
+    int elem_proz = 0;
+    mat_data_t max_elem = 0;
+    mat_data_t min_elem = 0;
+    printf(CYAN "Формат ввода:\n" RESET
+    YELLOW
+    "Сначала вводится размерность вектора и процент заполнения {j} {proz}\n"
+    "Размерность - целые числа в интервале [1, ");
+    printf("%i", MAX_MATR_SIZE);
+    printf("]\nПроцент заполнения - целое число в интервале [0, 100]\n");
+    printf("Затем вводятся ограничения для значения элемента в формате {min} {max}, где max и min целые числа\n"
+    "типа long long int\n"
+    "Если нужно, чтобы вектор была заполнена одним значением, от max = min\n");
+
+    printf (YELLOW "Введите размерность вектора и процент заполнения: " RESET);
+    if (fscanf(stdin, "%d %d", &cols, &elem_proz) != 2 ||\
+     ((cols > MAX_MATR_SIZE || cols <= 0) || (elem_proz < 0) || (elem_proz > 100)))
+    {
+        status = BAD_MAT_DIMS;
+        printf(RED "<!> Ошибка, размеры вектора не соответствуют условию\n" RESET);
+    }
+    else
+    {
+        *matrix = sp_zero(rows, cols);
+        if (matrix != NULL)
+        {
+            printf(GREEN "Вектор успешно инициализирован\n" RESET);
+            printf (YELLOW "Введите ограничения для значений элементов:\n" RESET);
+            if (fscanf(stdin, "%lld %lld", &min_elem, &max_elem) != 2 || max_elem < min_elem)
+            {
+                status = BAD_FSCANF;
+                printf(RED "<!> Ошибка, диапазон значений введён некорректно\n" RESET);
+            }
+        }
+        else
+        {
+            printf(RED "<!> Ошибка при выделении памяти, попробуйте ещё раз\n" RESET);
+            status = FAILURE;
+        }
+    }
+
+    if (status == SUCCESS)  
+    {
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                mat_data_t new_elem = 0;
+                while (new_elem == 0)
+                    new_elem = get_rand_range_int(min_elem, max_elem);
+                
+                if (get_rand_range_int(0, 100) <= elem_proz)
+                    sp_set(matrix, i, j, new_elem);
+            }
+        }
+    }
+    clean_input_stream();
+    if (status == SUCCESS)
+        printf(GREEN "Матрица успешно сгенерирована\n" RESET);
+    if (status != FAILURE)
+        status = SUCCESS;
     return status;
 }
 
@@ -532,7 +668,18 @@ int standart_mult(sp_mat_t *matrix, sp_mat_t *vector)
     int status = SUCCESS;
     float time = 0;
     sp_mat_t output;
-    status = sp_mult_vector_slow(&output, vector, matrix, &time);
+    if (matrix->rows == 0 || matrix->cols == 0)
+    {
+        printf(RED "<!> Внимание, матрица должна быть инициализирована\n" RESET);
+        status = BAD_FSCANF;
+    }
+    else if (vector->cols == 0 || vector->rows == 0)
+    {
+        printf(RED "<!> Внимание, вектор должен быть инициализирован\n" RESET);
+        status = BAD_FSCANF;
+    }
+    else
+        status = sp_mult_vector_slow(&output, vector, matrix, &time);
     if (status == SUCCESS)
     {
         printf(GREEN "Умножение прошло успешно\n"
@@ -622,9 +769,14 @@ int mult_diff(sp_mat_t *matrix, sp_mat_t *vector)
         YELLOW 
         "Время быстрого умножения: %f\n" 
         "Время медленного умножения: %f\n" 
+        "Память быстрого умножения: %ld\n"
+        "Память медленного умножения: %ld\n"
         "Выберите способ вывода результата умножения:\n" 
         "1 - Вывод в консоль\n" 
-        "2 - Вывод в файл\n" CYAN "> " RESET, time_f, time_s);
+        "2 - Вывод в файл\n" CYAN "> " RESET, time_f, time_s,\
+         sp_calc_size(matrix) + sp_calc_size(vector) + sp_calc_size(&output_f),\
+        sizeof(mat_data_t) * (matrix->cols * matrix->rows + vector->cols * vector->rows\
+        + output_s.cols + output_s.rows));
         int option = get_option();
         switch (option)
         {
@@ -653,7 +805,6 @@ int mult_diff(sp_mat_t *matrix, sp_mat_t *vector)
     }
     return status;
 }
-
 
 // Функция работы с программой
 int menu_loop(void)
@@ -692,7 +843,7 @@ int menu_loop(void)
             break;
         // Генерация матрицы с заданными параметрами
         case 4:
-            ;
+            status = sp_mat_gen(&matrix);
             break;
         // Вывод матрицы в матричном виде
         case 5:
@@ -748,6 +899,10 @@ int menu_loop(void)
         // Вывести вектор на экран
         case 14:
             status = print_vector_to_console(&vector);
+            break;
+        // Сгенерировать вектор
+        case 15:
+            status = sp_mat_gen_vec(&vector);
             break;
         // Ошибка ввода опции
         default:
