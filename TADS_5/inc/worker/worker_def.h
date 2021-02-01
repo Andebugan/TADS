@@ -3,7 +3,7 @@
 
 #include "queue.h"
 
-// тип системы (реализация очередей)
+// Тип системы (реализация очередей)
 typedef enum
 {
     NONE,
@@ -11,14 +11,14 @@ typedef enum
     WORKER_LIST
 } worker_type_t;
 
-// система с очередями на массивах
+// Система с очередями на массивах
 typedef struct
 {
     qu_arr_t qu_1;
     qu_arr_t qu_2;
 } worker_arr_t;
 
-// система с очередями на списках
+// Система с очередями на списках
 typedef struct
 {
     qu_lst_t qu_1;

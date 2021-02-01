@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "worker/worker_lst.h"
 
+// Создание очереди-списка
 worker_lst_t wl_create(void)
 {
     worker_lst_t worker;
@@ -11,6 +12,7 @@ worker_lst_t wl_create(void)
     return worker;
 }
 
+// Удаление очереди списка
 void wl_destroy(worker_lst_t *worker)
 {
     if (worker->qu_1 != NULL)

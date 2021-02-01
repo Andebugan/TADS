@@ -4,31 +4,31 @@
 #include <stdbool.h>
 #include "queue/queue_common.h"
 
-// статистика одной очереди
+// Статистика одной очереди
 typedef struct
 {
-    unsigned int curr_length; // текущая длина очереди
-    float mean_length;        // средняя длина очереди
-    float mean_time;          // среднее время пребывания заявок в очереди
+    unsigned int curr_length; // Текущая длина очереди
+    float mean_length;        // Средняя длина очереди
+    float mean_time;          // Среднее время пребывания заявок в очереди
 } queue_stats_t;
 
-// статистика выдаваемая при моделировании
+// Статистика выдаваемая при моделировании
 typedef struct
 {
-    // статистика очередей в отдельности
+    // Статистика очередей в отдельности
     queue_stats_t qu_1;
     queue_stats_t qu_2;
 
-    // текущие обрабатываемые заявки
+    // Текущие обрабатываемые заявки
     qdata_t data_1;
     qdata_t data_2;
-    bool data_1_processing; // обрабатывается ли заявка первым ОА
-    bool data_2_processing; // обрабатывается ли заявка вторым ОА
+    bool data_1_processing; // Обрабатывается ли заявка первым ОА
+    bool data_2_processing; // Обрабатывается ли заявка вторым ОА
 
-    // общие параметры
-    float model_time;         // полное время моделирования
-    float free_time;          // время простоя второго ОА
-    unsigned int activations; // кол-во срабатываний первого ОА
+    // Общие параметры
+    float model_time;         // Полное время моделирования
+    float free_time;          // Время простоя второго ОА
+    unsigned int activations; // Кол-во срабатываний первого ОА
 } worker_stats_t;
 
 #endif // _WORKER_STATS_T_

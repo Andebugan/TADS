@@ -773,7 +773,8 @@ int mult_diff(sp_mat_t *matrix, sp_mat_t *vector)
         "Память медленного умножения: %ld\n"
         "Выберите способ вывода результата умножения:\n" 
         "1 - Вывод в консоль\n" 
-        "2 - Вывод в файл\n" CYAN "> " RESET, time_f, time_s,\
+        "2 - Вывод в файл\n"
+        "3 - Не выводить\n" CYAN "> " RESET, time_f, time_s,\
          sp_calc_size(matrix) + sp_calc_size(vector) + sp_calc_size(&output_f),\
         sizeof(mat_data_t) * (matrix->cols * matrix->rows + vector->cols * vector->rows\
         + output_s.cols + output_s.rows));
@@ -791,6 +792,10 @@ int mult_diff(sp_mat_t *matrix, sp_mat_t *vector)
         case 2:
             status = print_vector_to_file(&output_s);
             status = print_vector_to_file(&output_f);
+            break;
+        // Вывод в файл
+        case 3:
+            ;
             break;
         // Ошибка ввода опции
         default:

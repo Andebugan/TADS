@@ -5,7 +5,7 @@
 #include "status_codes.h"
 #include "sparse_matrix.h"
 
-unsigned int mult_iterations = 1000;
+unsigned long int mult_iterations = 10;
 
 #define ASSERT_MAT(matrix)                                                                                                 \
     {                                                                                                                      \
@@ -154,7 +154,15 @@ void sp_zip(sp_mat_t *matrix)
             matrix->rows_array[++row] -= z_count; 
 
         if (matrix->data_array[nz_index] == 0) // Если элемент равен нулю, то увеличиваем счётчик нулевых элементов
-            z_count++;
+        {
+        // Подбираем следующие нулевые элементы
+            mat_index_t strike = 0;
+            while (matrix->data_array[nz_index + strike] == 0)
+            {
+                z_count++;
+                strike++;
+            }
+        }
 
         // Смещаем элементы влево на величину количества нулевых элементов
         matrix->data_array[nz_index] = matrix->data_array[nz_index + z_count];
@@ -294,7 +302,7 @@ int sp_mult_vector_fast(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix, fl
 
         START_TIMER;
 
-        for (unsigned int iteration = 0; iteration < mult_iterations; iteration++)
+        for (unsigned long int iteration = 0; iteration < mult_iterations; iteration++)
         {
             // Индекс текущего обрабатываемого элемента матрицы - он же индекс столбца
             for (mat_index_t nz_index = 0; nz_index < output->cols; nz_index++)
@@ -307,7 +315,6 @@ int sp_mult_vector_fast(sp_mat_t *output, sp_mat_t *vector, sp_mat_t *matrix, fl
                 mat_index_t nz_vec_index = 0;
                 mat_index_t nz_mat_index_end = matrix->rows_array[nz_index + 1];
                 mat_index_t nz_vec_index_end = vector->nz_count;
-
                 mat_data_t sum = 0;
 
                 // Пока не дошли до конца хотя-бы одной из строк матриц

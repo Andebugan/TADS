@@ -1,6 +1,7 @@
 #ifndef _STATUS_CODES_H_
 #define _STATUS_CODES_H_
 
+// Коды возврата
 enum status_codes
 {
     SUCCESS = 0,
